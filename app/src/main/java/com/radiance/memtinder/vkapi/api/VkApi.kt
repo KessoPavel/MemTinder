@@ -12,15 +12,23 @@ object VkApi: IVkApi {
 
     val callback = object: VKAuthCallback {
         override fun onLogin(token: VKAccessToken) {
+            for (listener in authorizationListener) {
+                listener.isAuthorized(true)
+            }
             isAuthorized = true
         }
 
         override fun onLoginFailed(errorCode: Int) {
+            for (listener in authorizationListener) {
+                listener.isAuthorized(false)
+            }
+            isAuthorized = false
         }
     }
 
     private val groupListenerList = ArrayList<IVkApi.GroupListener>()
     private val memesListenerList = ArrayList<IVkApi.MemesListener>()
+    private val authorizationListener = ArrayList<IVkApi.AuthorizationListener>()
 
     private val recommendedMemesListenerList = ArrayList<IVkApi.RecommendedMemesListener>()
 
@@ -83,6 +91,18 @@ object VkApi: IVkApi {
     override fun removeRecommendedMemesListener(memesListener: IVkApi.RecommendedMemesListener) {
         if (recommendedMemesListenerList.contains(memesListener)) {
             recommendedMemesListenerList.remove(memesListener)
+        }
+    }
+
+    override fun addAuthorizationListener(listener: IVkApi.AuthorizationListener) {
+        if (!authorizationListener.contains(listener)) {
+            authorizationListener.add(listener)
+        }
+    }
+
+    override fun removeAuthorizationListener(listener: IVkApi.AuthorizationListener) {
+        if (authorizationListener.contains(listener)) {
+            authorizationListener.remove(listener)
         }
     }
 

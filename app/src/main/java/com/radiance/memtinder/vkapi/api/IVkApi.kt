@@ -17,6 +17,8 @@ interface IVkApi {
     fun removeMemesListener(memesListener: MemesListener)
     fun addRecommendedMemesListener(memesListener: RecommendedMemesListener)
     fun removeRecommendedMemesListener(memesListener: RecommendedMemesListener)
+    fun addAuthorizationListener(listener: AuthorizationListener)
+    fun removeAuthorizationListener(listener: AuthorizationListener)
 
     interface GroupListener {
         fun receiveGroup(answer: GroupAnswer)
@@ -28,5 +30,9 @@ interface IVkApi {
 
     interface RecommendedMemesListener {
         fun receiveMemes(answer: MemesAnswer)
+    }
+
+    interface AuthorizationListener {
+        fun isAuthorized(boolean: Boolean)
     }
 }
