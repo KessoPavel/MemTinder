@@ -68,6 +68,16 @@ class MemProvider(private val sharedPreference: SharedPreferences): IMemProvider
         saveEnabledGroup()
     }
 
+    override fun clearEnabled() {
+        enabledGroup.clear()
+        saveEnabledGroup()
+    }
+
+    override fun enabledAll() {
+        enabledGroup.addAll(groups)
+        saveEnabledGroup()
+    }
+
     override fun requestMemes(count: Int) {
         VkApi.requestMemes(enabledGroup, count, startFrom)
     }

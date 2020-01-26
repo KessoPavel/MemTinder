@@ -21,6 +21,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -32,6 +35,16 @@ dependencies {
 
     //vk
     implementation 'com.vk:androidsdk:2.2.0'
+
+    //swipe
+    implementation "com.yuyakaido.android:card-stack-view:2.3.4"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+
+    //image load
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
 
     //tests
     testImplementation 'junit:junit:4.12'

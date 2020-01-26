@@ -15,6 +15,8 @@ interface IMemProvider {
 
     fun getGroups(): List<VkGroup>
     fun enableMemFromGroup(group: VkGroup, enable: Boolean)
+    fun clearEnabled()
+    fun enabledAll()
 
     fun requestMemes(count: Int)
 
