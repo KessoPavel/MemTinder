@@ -1,10 +1,13 @@
-package com.radiance.memtinder
+package com.radiance.memtinder.cardAdapter
 
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.radiance.memtinder.R
+import com.radiance.memtinder.getBestResolutionImage
+import com.radiance.memtinder.inflate
 import com.radiance.memtinder.vkapi.group.VkGroup
 import com.radiance.memtinder.vkapi.id.VkId
 import com.radiance.memtinder.vkapi.memes.VkMemes
@@ -28,7 +31,10 @@ class CardSwipeAdapter(
             R.layout.mem_view
         }
         val view = parent.inflate(r)
-        return ViewHolder(view, listener)
+        return ViewHolder(
+            view,
+            listener
+        )
     }
 
     override fun getItemCount() = memes.size

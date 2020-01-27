@@ -1,8 +1,6 @@
-package com.radiance.memtinder
+package com.radiance.memtinder.memProvider
 
 import android.content.SharedPreferences
-import com.radiance.memtinder.memProvider.IMemProvider
-import com.radiance.memtinder.memProvider.MemProvider
 
 object ProviderDispatcher {
     private var memProvider: MemProvider? = null

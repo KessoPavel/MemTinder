@@ -17,7 +17,6 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
     private val memListenerList = ArrayList<IMemProvider.MemListener>()
 
     override fun load() {
-        startFrom = sharedPreference.getString(START_FROM_KEY, "").toString()
         enabledGroupIds = sharedPreference.getString(ENABLED_GROUP_IDS_KEY, "").toString()
 
         VkApi.addMemesListener(this)
@@ -98,8 +97,6 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
                     enabledGroup.add(it)
                 }
             }
-        } else {
-            //enabledGroup.addAll(groups)
         }
 
         for (listener in updateListenerList) {
@@ -109,7 +106,6 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
 
     override fun receiveMemes(answer: MemesAnswer) {
         startFrom = answer.nextFrom
-        saveStartFrom()
 
         for (listener in memListenerList) {
             listener.receiveMemes(answer.memes)
@@ -137,13 +133,6 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         edit.putString(ENABLED_GROUP_IDS_KEY, ids)
         edit.apply()
         enabledGroupIds = ids
-    }
-
-    private fun saveStartFrom() {
-        val edit = sharedPreference.edit()
-
-        edit.putString(START_FROM_KEY, startFrom)
-        edit.apply()
     }
 
     companion object {

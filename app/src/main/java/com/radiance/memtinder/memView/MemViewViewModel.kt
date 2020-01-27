@@ -3,7 +3,7 @@ package com.radiance.memtinder.memView
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.radiance.memtinder.ProviderDispatcher
+import com.radiance.memtinder.memProvider.ProviderDispatcher
 import com.radiance.memtinder.memProvider.IMemProvider
 import com.radiance.memtinder.vkapi.api.IVkApi
 import com.radiance.memtinder.vkapi.api.VkApi
@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.random.Random
 
 class MemViewViewModel : ViewModel(),
     IMemProvider.MemListener,

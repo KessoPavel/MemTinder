@@ -3,31 +3,26 @@ package com.radiance.memtinder.memView
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
-import com.radiance.memtinder.CardSwipeAdapter
-
+import com.radiance.memtinder.cardAdapter.CardSwipeAdapter
 import com.radiance.memtinder.R
 import com.radiance.memtinder.getBestResolutionImage
 import com.radiance.memtinder.memProvider.MemProvider
-import com.radiance.memtinder.photoView.PhotoViewer
 import com.radiance.memtinder.vkapi.image.VkImage
 import com.radiance.memtinder.vkapi.memes.VkMemes
 import com.stfalcon.imageviewer.StfalconImageViewer
 import com.yuyakaido.android.cardstackview.*
-import kotlinx.android.synthetic.main.mem_view.*
-import kotlinx.android.synthetic.main.mem_view.view.*
 import kotlinx.android.synthetic.main.mem_view_fragment.*
-import java.util.ArrayList
+import java.util.*
 
 class MemView : Fragment(), CardStackListener, CardSwipeAdapter.ClickListener {
 
@@ -37,7 +32,13 @@ class MemView : Fragment(), CardStackListener, CardSwipeAdapter.ClickListener {
 
     private lateinit var viewModel: MemViewViewModel
     private val manager by lazy { CardStackLayoutManager(context, this) }
-    private val adapter by lazy { CardSwipeAdapter(ArrayList(), ArrayList(), this) }
+    private val adapter by lazy {
+        CardSwipeAdapter(
+            ArrayList(),
+            ArrayList(),
+            this
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -125,7 +126,7 @@ class MemView : Fragment(), CardStackListener, CardSwipeAdapter.ClickListener {
     @SuppressLint("Range")
     override fun onImageClick(mem: VkMemes, imageView: ImageView) {
         StfalconImageViewer.Builder<VkImage>(context, mem.images, ::loadPosterImage)
-            .withBackgroundColor(Color.parseColor("#00000000"))
+            .withBackgroundColor(Color.BLACK)
             .withTransitionFrom(imageView)
             .show()
     }
