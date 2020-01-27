@@ -1,6 +1,7 @@
 package com.radiance.memtinder.vkapi.api
 
 import com.radiance.memtinder.vkapi.group.VkGroup
+import com.radiance.memtinder.vkapi.id.VkId
 import com.radiance.memtinder.vkapi.image.Resolution
 import com.radiance.memtinder.vkapi.image.VkImage
 import com.radiance.memtinder.vkapi.memes.VkMemes
@@ -51,6 +52,7 @@ class RecommendedRequest(
                     try {
                         val item = items.getJSONObject(i)
                         val text = item.getString("text")
+                        val source_id = item.getString("source_id")
 
                         val photos = ArrayList<VkImage>()
                         val attachment = item.getJSONArray("attachments")
@@ -79,8 +81,10 @@ class RecommendedRequest(
                             }
                         }
 
+                        val sourceId = VkId(source_id)
+
                         if (photos.isNotEmpty()) {
-                            answer.add(VkMemes(text, photos))
+                            answer.add(VkMemes(text, photos, sourceId))
                         }
                     } catch (e: JSONException) {
 

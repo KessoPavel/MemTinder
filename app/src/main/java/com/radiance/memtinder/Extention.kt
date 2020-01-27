@@ -28,3 +28,22 @@ fun VkImage.getBestResolutionImage(): String {
 
     return ""
 }
+
+fun VkImage.getMinResolutionImage(): String {
+    val resolutions = this.getResolutionList()
+
+    var min = resolutions[0].height
+    var minIndex = 0
+    for (resolution in resolutions) {
+        if (resolution.height < min) {
+            minIndex = resolutions.indexOf(resolution)
+            min = resolution.height
+        }
+    }
+
+    this.getImageLink(resolutions[minIndex])?.let {
+        return it
+    }
+
+    return ""
+}

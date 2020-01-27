@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.yuyakaido.android.cardstackview.CardStackView
-        android:id="@+id/card_stack_view"
+    <fragment
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="4dp"
-        android:clipToPadding="false">
-    </com.yuyakaido.android.cardstackview.CardStackView>
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/navigation_graph"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

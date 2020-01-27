@@ -7,7 +7,7 @@ import com.radiance.memtinder.vkapi.api.MemesAnswer
 import com.radiance.memtinder.vkapi.api.VkApi
 import com.radiance.memtinder.vkapi.group.VkGroup
 
-class MemProvider(private val sharedPreference: SharedPreferences): IMemProvider, IVkApi.MemesListener, IVkApi.GroupListener {
+class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider, IVkApi.MemesListener, IVkApi.GroupListener {
     private var startFrom: String = ""
     private var enabledGroupIds = ""
     private val groups = ArrayList<VkGroup>()
@@ -24,6 +24,10 @@ class MemProvider(private val sharedPreference: SharedPreferences): IMemProvider
         VkApi.addGroupListener(this)
 
         VkApi.requestGroups()
+    }
+
+    fun updateSharedPreference(sharedPreference: SharedPreferences) {
+        this.sharedPreference = sharedPreference
     }
 
     override fun addUpdateListener(listener: IMemProvider.UpdateGroupListener) {
