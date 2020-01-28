@@ -1,4 +1,4 @@
-package com.radiance.memtinder.memProvider
+package com.radiance.memtinder.memProvider.news
 
 import android.content.SharedPreferences
 import com.radiance.memtinder.vkapi.api.GroupAnswer
@@ -16,6 +16,8 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
     private val updateListenerList = ArrayList<IMemProvider.UpdateGroupListener>()
     private val memListenerList = ArrayList<IMemProvider.MemListener>()
 
+    private var isLoaded: Boolean = false
+
     override fun load() {
         enabledGroupIds = sharedPreference.getString(ENABLED_GROUP_IDS_KEY, "").toString()
 
@@ -23,6 +25,10 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         VkApi.addGroupListener(this)
 
         VkApi.requestGroups()
+    }
+
+    override fun isLoaded(): Boolean {
+        return isLoaded
     }
 
     fun updateSharedPreference(sharedPreference: SharedPreferences) {
@@ -57,6 +63,10 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         return groups
     }
 
+    override fun getEnabledGroup(): List<VkGroup> {
+        return enabledGroup
+    }
+
     override fun enableMemFromGroup(group: VkGroup, enable: Boolean) {
         if (enable) {
             if (!enabledGroup.contains(group)) {
@@ -77,6 +87,7 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
     }
 
     override fun enabledAll() {
+        enabledGroup.clear()
         enabledGroup.addAll(groups)
         saveEnabledGroup()
     }
@@ -85,7 +96,13 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         VkApi.requestMemes(enabledGroup, count, startFrom)
     }
 
+    override fun cleatStartFrom() {
+        startFrom = ""
+    }
+
     override fun receiveGroup(answer: GroupAnswer) {
+        isLoaded = true
+
         groups.clear()
         groups.addAll(answer.groups)
 
@@ -94,7 +111,8 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
             for (id in ids) {
                 val group = getGroupBuyId(id)
                 group?.let {
-                    enabledGroup.add(it)
+                    if (!enabledGroup.contains(it))
+                        enabledGroup.add(it)
                 }
             }
         }
@@ -125,7 +143,7 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         var ids = ""
 
         for (group in enabledGroup) {
-            ids += group.id.getGroupId() + ", "
+            ids += group.id.getGroupId() + ","
         }
 
         val edit = sharedPreference.edit()
