@@ -1,16 +1,20 @@
 package com.radiance.memtinder.vkapi.api
 
 import android.app.Activity
+import android.content.SharedPreferences
 import com.radiance.memtinder.vkapi.group.VkGroup
 import com.vk.api.sdk.VK
+import com.vk.api.sdk.VKApiConfig
+import com.vk.api.sdk.VKApiManager
 import com.vk.api.sdk.VKTokenExpiredHandler
 import com.vk.api.sdk.auth.VKAccessToken
 import com.vk.api.sdk.auth.VKAuthCallback
 import com.vk.api.sdk.auth.VKScope
+import kotlin.concurrent.fixedRateTimer
 
-object VkApi: IVkApi {
+object VkApi : IVkApi {
 
-    val callback = object: VKAuthCallback {
+    val callback = object : VKAuthCallback {
         override fun onLogin(token: VKAccessToken) {
             for (listener in authorizationListener) {
                 listener.isAuthorized(true)
@@ -38,8 +42,20 @@ object VkApi: IVkApi {
         activity.applicationContext?.let {
             VK.initialize(it)
         }
+
         VK.addTokenExpiredHandler(tokenTracker)
-        VK.login(activity, arrayListOf(VKScope.WALL, VKScope.PHOTOS, VKScope.GROUPS, VKScope.FRIENDS))
+
+        if (!VK.isLoggedIn()) {
+            VK.login(
+                activity,
+                arrayListOf(VKScope.WALL, VKScope.PHOTOS, VKScope.GROUPS, VKScope.FRIENDS)
+            )
+        } else {
+            for (listener in authorizationListener) {
+                listener.isAuthorized(true)
+            }
+            isAuthorized = true
+        }
     }
 
     override fun isAuthorized(): Boolean {
@@ -51,7 +67,7 @@ object VkApi: IVkApi {
     }
 
     override fun requestMemes(groups: List<VkGroup>, count: Int, startFrom: String) {
-        VK.execute(NewsfeedRequest(memesListenerList,groups, count, startFrom))
+        VK.execute(NewsfeedRequest(memesListenerList, groups, count, startFrom))
     }
 
     override fun requestRecommendedMemes(count: Int, startFrom: String) {

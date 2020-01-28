@@ -21,7 +21,7 @@ interface IMemProvider {
 
     fun requestMemes(count: Int)
     fun cleatStartFrom()
-
+    fun recommendedNews()
     interface MemListener {
         fun receiveMemes(memes: List<VkMemes>)
     }

@@ -53,12 +53,21 @@ class MemViewViewModel : ViewModel(),
         }
     }
 
+    fun clear() {
+        memList.value = ArrayList()
+        memProvider.cleatStartFrom()
+    }
+
     fun stop() {
         memProvider.removeMemListener(this)
         memProvider.removeUpdateLister(this)
     }
 
-    fun requestMem(count: Int) {
+    fun requestMem(count: Int, fromStart: Boolean = false) {
+        if (fromStart) {
+            memProvider.cleatStartFrom()
+        }
+
         if (memProvider.isLoaded()) {
             if (!requestSender) {
                 memProvider.requestMemes(count)
@@ -96,5 +105,10 @@ class MemViewViewModel : ViewModel(),
 
     override fun isAuthorized(boolean: Boolean) {
         memProvider.load()
+    }
+
+    fun recommendedNews() {
+        clear()
+        memProvider.recommendedNews()
     }
 }

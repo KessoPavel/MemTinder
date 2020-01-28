@@ -7,7 +7,7 @@ import com.radiance.memtinder.vkapi.api.MemesAnswer
 import com.radiance.memtinder.vkapi.api.VkApi
 import com.radiance.memtinder.vkapi.group.VkGroup
 
-class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider, IVkApi.MemesListener, IVkApi.GroupListener {
+class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider, IVkApi.MemesListener, IVkApi.GroupListener, IVkApi.RecommendedMemesListener {
     private var startFrom: String = ""
     private var enabledGroupIds = ""
     private val groups = ArrayList<VkGroup>()
@@ -22,6 +22,7 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         enabledGroupIds = sharedPreference.getString(ENABLED_GROUP_IDS_KEY, "").toString()
 
         VkApi.addMemesListener(this)
+        VkApi.addRecommendedMemesListener(this)
         VkApi.addGroupListener(this)
 
         VkApi.requestGroups()
@@ -93,10 +94,21 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
     }
 
     override fun requestMemes(count: Int) {
-        VkApi.requestMemes(enabledGroup, count, startFrom)
+        if (source == 0) {
+            VkApi.requestMemes(enabledGroup, count, startFrom)
+        } else {
+            VkApi.requestRecommendedMemes(count, startFrom)
+        }
     }
 
     override fun cleatStartFrom() {
+        startFrom = ""
+    }
+
+    private var source = 0
+
+    override fun recommendedNews() {
+        source = 1
         startFrom = ""
     }
 

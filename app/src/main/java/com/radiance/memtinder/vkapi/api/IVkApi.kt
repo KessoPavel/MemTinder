@@ -1,6 +1,7 @@
 package com.radiance.memtinder.vkapi.api
 
 import android.app.Activity
+import android.content.SharedPreferences
 import com.radiance.memtinder.vkapi.group.VkGroup
 
 interface IVkApi {
