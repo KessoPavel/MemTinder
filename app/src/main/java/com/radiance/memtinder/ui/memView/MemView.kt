@@ -34,13 +34,18 @@ import kotlinx.android.synthetic.main.toolbar_mem.*
 class MemView
     : Fragment(),
     CardStackListener,
-    CardSwipeAdapter.ClickListener
-{
+    CardSwipeAdapter.ClickListener {
     private lateinit var viewModel: MemViewViewModel
     private lateinit var newsManager: CardStackLayoutManager
     private val newsAdapter: CardSwipeAdapter by lazy {
         CardSwipeAdapter(ArrayList(), this)
     }
+    private lateinit var recommendedManager: CardStackLayoutManager
+    private val recommendedAdapter: CardSwipeAdapter by lazy {
+        CardSwipeAdapter(ArrayList(), this)
+    }
+
+
     private val requestCount = 10
 
     override fun onCreateView(
@@ -60,26 +65,45 @@ class MemView
     }
 
     private fun initView() {
+        recommendedManager = CardStackLayoutManager(context, this)
         newsManager = CardStackLayoutManager(context, this)
+
         newsAdapter.memes = ArrayList()
         newsAdapter.notifyDataSetChanged()
 
         newsManager.setStackFrom(StackFrom.Right)
         newsManager.setVisibleCount(4)
 
-        card_stack_view.layoutManager = newsManager
-        card_stack_view.adapter = newsAdapter
+        recommendedManager.setStackFrom(StackFrom.Right)
+        recommendedManager.setVisibleCount(4)
+
+        if (source_switch.isChecked) {
+            card_stack_view.layoutManager = recommendedManager
+            card_stack_view.adapter = recommendedAdapter
+        } else {
+            card_stack_view.layoutManager = newsManager
+            card_stack_view.adapter = newsAdapter
+        }
 
         update_button.setOnClickListener {
-            newsAdapter.memes = ArrayList()
-            newsAdapter.notifyDataSetChanged()
+            if (source_switch.isChecked) {
+                recommendedAdapter.memes = ArrayList()
+                recommendedAdapter.notifyDataSetChanged()
+            } else {
+                newsAdapter.memes = ArrayList()
+                newsAdapter.notifyDataSetChanged()
+            }
 
             viewModel.clear()
             viewModel.requestMem(requestCount, true)
         }
 
         share_button.setOnClickListener {
-            val mem = newsAdapter.memes[newsManager.topPosition]
+            val mem: MemCard = if (source_switch.isChecked) {
+                recommendedAdapter.memes[recommendedManager.topPosition]
+            } else {
+                newsAdapter.memes[newsManager.topPosition]
+            }
 
             var shareString = mem.title
 
@@ -102,9 +126,14 @@ class MemView
             card_stack_view.rewind()
         }
 
-        source_switch.setOnClickListener{
-            newsAdapter.memes = ArrayList()
-            newsAdapter.notifyDataSetChanged()
+        source_switch.setOnClickListener {
+            if (source_switch.isChecked) {
+                card_stack_view.layoutManager = recommendedManager
+                card_stack_view.adapter = recommendedAdapter
+            } else {
+                card_stack_view.layoutManager = newsManager
+                card_stack_view.adapter = newsAdapter
+            }
 
             val source = if (source_switch.isChecked) {
                 Source.RECOMMENDED
@@ -126,7 +155,10 @@ class MemView
             Source.NEWS
         }
 
-        viewModel.init(context!!.getSharedPreferences(MemProvider.FILE_NAME, Context.MODE_PRIVATE), source)
+        viewModel.init(
+            context!!.getSharedPreferences(MemProvider.FILE_NAME, Context.MODE_PRIVATE),
+            source
+        )
         viewModel.news.observe(this, Observer { addNewMemes(it) })
         viewModel.recommended.observe(this, Observer { addRecommended(it) })
     }
@@ -140,8 +172,8 @@ class MemView
 
     private fun addRecommended(memes: ArrayList<VkMemes>?) {
         memes?.let {
-            newsAdapter.memes.addAll(memToCard(memes))
-            newsAdapter.notifyItemInserted(newsAdapter.memes.size - memes.size)
+            recommendedAdapter.memes.addAll(memToCard(memes))
+            recommendedAdapter.notifyItemInserted(newsAdapter.memes.size - memes.size)
         }
     }
 
@@ -152,15 +184,28 @@ class MemView
     }
 
     override fun onCardSwiped(direction: Direction?) {
-        val swipedMem = newsAdapter.memes[newsManager.topPosition]
-        val rating = direction?.toRating()
+        if (source_switch.isChecked) {
+            val swipedMem = recommendedAdapter.memes[recommendedManager.topPosition]
+            val rating = direction?.toRating()
 
-        if (rating != null) {
-            viewModel.setRating(swipedMem.mem, rating)
-        }
+            if (rating != null) {
+                viewModel.setRating(swipedMem.mem, rating)
+            }
 
-        if ((newsAdapter.memes.size - newsManager.topPosition) <= 4) {
-            viewModel.requestMem(requestCount)
+            if ((recommendedAdapter.memes.size - recommendedManager.topPosition) <= 4) {
+                viewModel.requestMem(requestCount)
+            }
+        } else {
+            val swipedMem = newsAdapter.memes[newsManager.topPosition]
+            val rating = direction?.toRating()
+
+            if (rating != null) {
+                viewModel.setRating(swipedMem.mem, rating)
+            }
+
+            if ((newsAdapter.memes.size - newsManager.topPosition) <= 4) {
+                viewModel.requestMem(requestCount)
+            }
         }
     }
 
@@ -206,7 +251,7 @@ class MemView
         for (mem in memes) {
             val groupName = getGroupName(viewModel.groupList.value, mem.sourceId)
             val image = mem.images[0].getBestResolutionImage()
-            val imageCount = if(mem.images.size == 1) "" else mem.images.size.toString()
+            val imageCount = if (mem.images.size == 1) "" else mem.images.size.toString()
 
             val memCard = MemCard(
                 image,
