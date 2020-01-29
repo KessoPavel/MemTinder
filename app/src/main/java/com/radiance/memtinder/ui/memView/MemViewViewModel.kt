@@ -55,6 +55,7 @@ class MemViewViewModel : ViewModel(),
             if (!memProvider.isLoaded()) {
                 memProvider.load(currentSource)
             } else {
+                memProvider.setSource(currentSource)
                 groupList.value = ArrayList(memProvider.getGroups())
             }
         }

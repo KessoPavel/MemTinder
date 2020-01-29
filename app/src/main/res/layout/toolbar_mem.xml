@@ -18,10 +18,12 @@
         android:background="#00FFFFFF"
         android:textColor="@android:color/white"
         android:layout_gravity="center"
+        android:textSize="20sp"
         android:textOff="@string/news"
         android:textOn="@string/recommendation"/>
 
     <ImageButton
+        android:id="@+id/settings"
         android:layout_margin="10dp"
         android:layout_width="30dp"
         android:layout_height="30dp"

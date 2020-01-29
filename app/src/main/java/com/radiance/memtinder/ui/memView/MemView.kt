@@ -7,9 +7,11 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.radiance.memtinder.R
@@ -19,6 +21,7 @@ import com.radiance.memtinder.memProvider.news.Source
 import com.radiance.memtinder.toRating
 import com.radiance.memtinder.ui.cardAdapter.CardSwipeAdapter
 import com.radiance.memtinder.ui.cardAdapter.MemCard
+import com.radiance.memtinder.ui.textViewer.TextViewer
 import com.radiance.memtinder.vkapi.group.VkGroup
 import com.radiance.memtinder.vkapi.id.VkId
 import com.radiance.memtinder.vkapi.image.VkImage
@@ -51,6 +54,7 @@ class MemView
     private lateinit var adapter: CardSwipeAdapter
 
     private val requestCount = 10
+    private val visibleCount = 4
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,13 +63,12 @@ class MemView
         return inflater.inflate(R.layout.fragment_memes, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
+    override fun onResume() {
+        super.onResume()
         initView()
         initViewModel()
 
-        viewModel.requestMem(requestCount)
+        viewModel.requestMem(requestCount, true)
     }
 
     private fun initView() {
@@ -132,12 +135,16 @@ class MemView
             viewModel.setSource(source)
             viewModel.requestMem(requestCount)
         }
+
+        settings.setOnClickListener{
+            findNavController().navigate(R.id.action_memView_to_groupSetting)
+        }
     }
 
     private fun initRecommendedView() {
         recommendedManager = CardStackLayoutManager(context, this)
         recommendedManager.setStackFrom(StackFrom.Right)
-        recommendedManager.setVisibleCount(4)
+        recommendedManager.setVisibleCount(visibleCount)
     }
 
     private fun initNewsView() {
@@ -146,7 +153,7 @@ class MemView
         newsAdapter.notifyDataSetChanged()
 
         newsManager.setStackFrom(StackFrom.Right)
-        newsManager.setVisibleCount(4)
+        newsManager.setVisibleCount(visibleCount)
     }
 
     private fun initViewModel() {
@@ -194,7 +201,7 @@ class MemView
             viewModel.setRating(swipedMem.mem, rating)
         }
 
-        if ((adapter.memes.size - manager.topPosition) <= 4) {
+        if ((adapter.memes.size - manager.topPosition) <= visibleCount) {
             viewModel.requestMem(requestCount)
         }
     }
@@ -229,7 +236,12 @@ class MemView
     }
 
     override fun onTextClick(mem: MemCard) {
-
+        activity?.supportFragmentManager?.let {
+            it.beginTransaction()
+                .add(R.id.nav_host_fragment, TextViewer.newInstance(mem.title))
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     override fun onGroupClick(mem: MemCard) {

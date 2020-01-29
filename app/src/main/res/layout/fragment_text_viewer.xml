@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/text_view_main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.textViewer.TextViewer"
+    android:background="@drawable/text_view_back">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:textColor="#E4E4E4"
+            android:textSize="20sp"
+            tools:text="sdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassdfsdfgsdfg dfsdfgsdfg s dfhskaf ndas dfbas fhas jbdfas dfasdfmasndfasfas fhasj dfa sdfassndfasfas fhasj dfa sdfas"/>
+
+    </ScrollView>
+
+    <ImageButton
+        android:id="@+id/close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:layout_margin="10dp"
+        android:background="@android:drawable/ic_menu_close_clear_cancel" />
+
+</FrameLayout>
