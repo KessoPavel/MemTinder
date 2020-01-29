@@ -11,7 +11,6 @@ import com.vk.api.sdk.VKMethodCall
 import com.vk.api.sdk.internal.ApiCommand
 import org.json.JSONException
 import org.json.JSONObject
-import java.util.*
 import kotlin.collections.ArrayList
 
 class NewsfeedRequest(
@@ -102,7 +101,7 @@ class NewsfeedRequest(
 
 
                 listeners.forEach {
-                    it.receiveMemes(memesAnswer)
+                    it.receiveNews(memesAnswer)
                 }
                 return memesAnswer
 
@@ -111,7 +110,7 @@ class NewsfeedRequest(
 
 
                 listeners.forEach {
-                    it.receiveMemes(memesAnswer)
+                    it.receiveNews(memesAnswer)
                 }
                 return memesAnswer
             }

@@ -94,7 +94,7 @@ class RecommendedRequest(
                 val memesAnswer = MemesAnswer(answer, nextFrom = nextfrom)
 
                 listeners.forEach {
-                    it.receiveMemes(memesAnswer)
+                    it.receiveRecommended(memesAnswer)
                 }
 
                 return memesAnswer
@@ -103,7 +103,7 @@ class RecommendedRequest(
                 val memesAnswer = MemesAnswer(answer, nextFrom = "")
 
                 listeners.forEach {
-                    it.receiveMemes(memesAnswer)
+                    it.receiveRecommended(memesAnswer)
                 }
 
                 return memesAnswer

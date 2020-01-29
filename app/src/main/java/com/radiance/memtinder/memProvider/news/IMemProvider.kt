@@ -4,8 +4,10 @@ import com.radiance.memtinder.vkapi.group.VkGroup
 import com.radiance.memtinder.vkapi.memes.VkMemes
 
 interface IMemProvider {
-    fun load()
+    fun load(source: Source)
     fun isLoaded(): Boolean
+
+    fun setSource(source: Source)
 
     fun addUpdateListener(listener: UpdateGroupListener)
     fun removeUpdateLister(listener: UpdateGroupListener)
@@ -19,11 +21,11 @@ interface IMemProvider {
     fun clearEnabled()
     fun enabledAll()
 
-    fun requestMemes(count: Int)
-    fun cleatStartFrom()
-    fun recommendedNews()
+    fun requestMemes(count: Int, update: Boolean = false)
+
     interface MemListener {
-        fun receiveMemes(memes: List<VkMemes>)
+        fun receiveNews(memes: List<VkMemes>)
+        fun receiveRecommended(memes: List<VkMemes>)
     }
 
     interface UpdateGroupListener {

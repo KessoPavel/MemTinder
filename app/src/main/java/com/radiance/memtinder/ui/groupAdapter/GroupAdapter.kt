@@ -9,11 +9,11 @@ import com.bumptech.glide.request.RequestOptions
 import com.radiance.memtinder.R
 import com.radiance.memtinder.getBestResolutionImage
 import com.radiance.memtinder.inflate
-import kotlinx.android.synthetic.main.group_item.view.*
+import kotlinx.android.synthetic.main.item_group.view.*
 
 class GroupAdapter(var groups: ArrayList<GroupItem>, private val listener: GroupItemListener) : RecyclerView.Adapter<GroupAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = parent.inflate(R.layout.group_item)
+        val view = parent.inflate(R.layout.item_group)
         return ViewHolder(view, listener)
     }
 

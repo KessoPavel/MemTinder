@@ -10,7 +10,7 @@
         android:id="@+id/group_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/group_item"/>
+        tools:listitem="@layout/item_group"/>
 
     <CheckBox
         android:id="@+id/selectAll"

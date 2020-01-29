@@ -10,12 +10,12 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.radiance.memtinder.R
 import com.radiance.memtinder.getBestResolutionImage
 import com.radiance.memtinder.memProvider.news.MemProvider
+import com.radiance.memtinder.memProvider.news.Source
 import com.radiance.memtinder.toRating
 import com.radiance.memtinder.ui.cardAdapter.CardSwipeAdapter
 import com.radiance.memtinder.ui.cardAdapter.MemCard
@@ -28,7 +28,8 @@ import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.StackFrom
-import kotlinx.android.synthetic.main.mem_view_fragment.*
+import kotlinx.android.synthetic.main.fragment_memes.*
+import kotlinx.android.synthetic.main.toolbar_mem.*
 
 class MemView
     : Fragment(),
@@ -36,8 +37,8 @@ class MemView
     CardSwipeAdapter.ClickListener
 {
     private lateinit var viewModel: MemViewViewModel
-    private lateinit var manager: CardStackLayoutManager
-    private val adapter: CardSwipeAdapter by lazy {
+    private lateinit var newsManager: CardStackLayoutManager
+    private val newsAdapter: CardSwipeAdapter by lazy {
         CardSwipeAdapter(ArrayList(), this)
     }
     private val requestCount = 10
@@ -46,7 +47,7 @@ class MemView
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.mem_view_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_memes, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -58,48 +59,27 @@ class MemView
         viewModel.requestMem(requestCount)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.settings -> {
-                viewModel.stop()
-                findNavController().navigate(R.id.action_memView_to_groupSetting)
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun initView() {
-        manager = CardStackLayoutManager(context, this)
-        adapter.memes = ArrayList()
-        adapter.notifyDataSetChanged()
+        newsManager = CardStackLayoutManager(context, this)
+        newsAdapter.memes = ArrayList()
+        newsAdapter.notifyDataSetChanged()
 
-        manager.setStackFrom(StackFrom.Right)
-        manager.setVisibleCount(4)
+        newsManager.setStackFrom(StackFrom.Right)
+        newsManager.setVisibleCount(4)
 
-        card_stack_view.layoutManager = manager
-        card_stack_view.adapter = adapter
+        card_stack_view.layoutManager = newsManager
+        card_stack_view.adapter = newsAdapter
 
         update_button.setOnClickListener {
-            adapter.memes = ArrayList()
-            adapter.notifyDataSetChanged()
+            newsAdapter.memes = ArrayList()
+            newsAdapter.notifyDataSetChanged()
 
             viewModel.clear()
             viewModel.requestMem(requestCount, true)
         }
 
         share_button.setOnClickListener {
-            val mem = adapter.memes[manager.topPosition]
+            val mem = newsAdapter.memes[newsManager.topPosition]
 
             var shareString = mem.title
 
@@ -122,25 +102,46 @@ class MemView
             card_stack_view.rewind()
         }
 
-        source.setOnClickListener{
-            adapter.memes = ArrayList()
-            adapter.notifyDataSetChanged()
+        source_switch.setOnClickListener{
+            newsAdapter.memes = ArrayList()
+            newsAdapter.notifyDataSetChanged()
 
-            viewModel.recommendedNews()
+            val source = if (source_switch.isChecked) {
+                Source.RECOMMENDED
+            } else {
+                Source.NEWS
+            }
+
+            viewModel.setSource(source)
             viewModel.requestMem(requestCount)
         }
     }
 
     private fun initViewModel() {
         viewModel = ViewModelProviders.of(this).get(MemViewViewModel::class.java)
-        viewModel.init(context!!.getSharedPreferences(MemProvider.FILE_NAME, Context.MODE_PRIVATE))
-        viewModel.memList.observe(this, Observer { addNewMemes(it) })
+
+        val source = if (source_switch.isChecked) {
+            Source.RECOMMENDED
+        } else {
+            Source.NEWS
+        }
+
+        viewModel.init(context!!.getSharedPreferences(MemProvider.FILE_NAME, Context.MODE_PRIVATE), source)
+        viewModel.news.observe(this, Observer { addNewMemes(it) })
+        viewModel.recommended.observe(this, Observer { addRecommended(it) })
     }
 
     private fun addNewMemes(memes: ArrayList<VkMemes>?) {
         memes?.let {
-            adapter.memes.addAll(memToCard(memes))
-            adapter.notifyItemInserted(adapter.memes.size - memes.size)
+            newsAdapter.memes.addAll(memToCard(memes))
+            newsAdapter.notifyItemInserted(newsAdapter.memes.size - memes.size)
+        }
+    }
+
+    private fun addRecommended(memes: ArrayList<VkMemes>?) {
+        memes?.let {
+            newsAdapter.memes.addAll(memToCard(memes))
+            newsAdapter.notifyItemInserted(newsAdapter.memes.size - memes.size)
         }
     }
 
@@ -151,14 +152,14 @@ class MemView
     }
 
     override fun onCardSwiped(direction: Direction?) {
-        val swipedMem = adapter.memes[manager.topPosition]
+        val swipedMem = newsAdapter.memes[newsManager.topPosition]
         val rating = direction?.toRating()
 
         if (rating != null) {
             viewModel.setRating(swipedMem.mem, rating)
         }
 
-        if ((adapter.memes.size - manager.topPosition) <= 4) {
+        if ((newsAdapter.memes.size - newsManager.topPosition) <= 4) {
             viewModel.requestMem(requestCount)
         }
     }

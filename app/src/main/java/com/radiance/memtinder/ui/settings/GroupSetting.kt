@@ -1,7 +1,6 @@
 package com.radiance.memtinder.ui.settings
 
 import android.content.Context
-import android.os.Build
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,12 +11,10 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.radiance.memtinder.R
-import com.radiance.memtinder.memProvider.ProviderDispatcher
-import com.radiance.memtinder.memProvider.news.IMemProvider
 import com.radiance.memtinder.memProvider.news.MemProvider
 import com.radiance.memtinder.ui.groupAdapter.GroupAdapter
 import com.radiance.memtinder.ui.groupAdapter.GroupItem
-import kotlinx.android.synthetic.main.group_setting_fragment.*
+import kotlinx.android.synthetic.main.fragment_settings.*
 
 class GroupSetting : Fragment(), GroupAdapter.GroupItemListener {
     private val adapter: GroupAdapter by lazy {
@@ -30,7 +27,7 @@ class GroupSetting : Fragment(), GroupAdapter.GroupItemListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.group_setting_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

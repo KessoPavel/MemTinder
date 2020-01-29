@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.radiance.memtinder.memProvider.ProviderDispatcher
 import com.radiance.memtinder.memProvider.news.IMemProvider
+import com.radiance.memtinder.memProvider.news.Source
 import com.radiance.memtinder.rating.Rating
 import com.radiance.memtinder.vkapi.api.IVkApi
 import com.radiance.memtinder.vkapi.api.VkApi
@@ -20,33 +21,39 @@ class MemViewViewModel : ViewModel(),
     IMemProvider.UpdateGroupListener,
     IVkApi.AuthorizationListener{
 
-    var memList: MutableLiveData<ArrayList<VkMemes>> = MutableLiveData()
+    var news: MutableLiveData<ArrayList<VkMemes>> = MutableLiveData()
+    var recommended: MutableLiveData<ArrayList<VkMemes>> = MutableLiveData()
     var groupList: MutableLiveData<List<VkGroup>> = MutableLiveData()
 
     init {
-        memList.value = ArrayList()
+        news.value = ArrayList()
+        recommended.value = ArrayList()
     }
 
     private lateinit var memProvider: IMemProvider
     private var loadCount = 0
     private var requestSender: Boolean = false
+    private var currentSource: Source = Source.NEWS
 
-    fun init(sharedPreferences: SharedPreferences?) {
+    fun init(sharedPreferences: SharedPreferences?, source: Source) {
         VkApi.addAuthorizationListener(this)
 
-        memList = MutableLiveData()
+        currentSource = source
+
+        news = MutableLiveData()
+        recommended = MutableLiveData()
         groupList = MutableLiveData()
 
-        memList.value = ArrayList()
+        clearNews()
+        clearRecommended()
 
         memProvider = ProviderDispatcher.getMemProvider(sharedPreferences!!)
         memProvider.addMemListener(this)
         memProvider.addUpdateListener(this)
-        memProvider.cleatStartFrom()
 
         if (VkApi.isAuthorized()) {
             if (!memProvider.isLoaded()) {
-                memProvider.load()
+                memProvider.load(currentSource)
             } else {
                 groupList.value = ArrayList(memProvider.getGroups())
             }
@@ -54,8 +61,18 @@ class MemViewViewModel : ViewModel(),
     }
 
     fun clear() {
-        memList.value = ArrayList()
-        memProvider.cleatStartFrom()
+        when (currentSource) {
+            Source.NEWS -> clearNews()
+            Source.RECOMMENDED -> clearRecommended()
+        }
+    }
+
+    fun clearNews(){
+        news.value = ArrayList()
+    }
+
+    fun clearRecommended() {
+        recommended.value = ArrayList()
     }
 
     fun stop() {
@@ -64,13 +81,9 @@ class MemViewViewModel : ViewModel(),
     }
 
     fun requestMem(count: Int, fromStart: Boolean = false) {
-        if (fromStart) {
-            memProvider.cleatStartFrom()
-        }
-
         if (memProvider.isLoaded()) {
             if (!requestSender) {
-                memProvider.requestMemes(count)
+                memProvider.requestMemes(count, fromStart)
                 requestSender = true
             }
         } else {
@@ -81,10 +94,19 @@ class MemViewViewModel : ViewModel(),
     fun setRating(mem: VkMemes, rating: Rating) {
     }
 
-    override fun receiveMemes(memes: List<VkMemes>) {
+    override fun receiveNews(memes: List<VkMemes>) {
         GlobalScope.launch {
             withContext(Dispatchers.Main) {
-                memList.value = ArrayList(memes)
+                news.value = ArrayList(memes)
+                requestSender = false
+            }
+        }
+    }
+
+    override fun receiveRecommended(memes: List<VkMemes>) {
+        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                recommended.value = ArrayList(memes)
                 requestSender = false
             }
         }
@@ -103,12 +125,12 @@ class MemViewViewModel : ViewModel(),
         }
     }
 
-    override fun isAuthorized(boolean: Boolean) {
-        memProvider.load()
+    fun setSource(source: Source) {
+        currentSource = source
+        memProvider.setSource(currentSource)
     }
 
-    fun recommendedNews() {
-        clear()
-        memProvider.recommendedNews()
+    override fun isAuthorized(boolean: Boolean) {
+        memProvider.load(currentSource)
     }
 }

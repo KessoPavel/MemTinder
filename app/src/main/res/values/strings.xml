@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">MemTinder</string>
     <integer name="com_vk_sdk_AppId">7294717</integer>
+
+    <string name="news">news</string>
+    <string name="recommendation">recommendation</string>
 </resources>

@@ -26,11 +26,11 @@ interface IVkApi {
     }
 
     interface MemesListener {
-        fun receiveMemes(answer: MemesAnswer)
+        fun receiveNews(answer: MemesAnswer)
     }
 
     interface RecommendedMemesListener {
-        fun receiveMemes(answer: MemesAnswer)
+        fun receiveRecommended(answer: MemesAnswer)
     }
 
     interface AuthorizationListener {

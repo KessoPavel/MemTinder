@@ -8,8 +8,12 @@ import com.radiance.memtinder.vkapi.api.VkApi
 import com.radiance.memtinder.vkapi.group.VkGroup
 
 class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider, IVkApi.MemesListener, IVkApi.GroupListener, IVkApi.RecommendedMemesListener {
-    private var startFrom: String = ""
+    private var startFromNews: String = ""
+    private var startFromRecommended: String = ""
+    private var currentSource: Source = Source.NEWS
+
     private var enabledGroupIds = ""
+
     private val groups = ArrayList<VkGroup>()
     private val enabledGroup = ArrayList<VkGroup>()
 
@@ -18,8 +22,10 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
 
     private var isLoaded: Boolean = false
 
-    override fun load() {
+    override fun load(source: Source) {
         enabledGroupIds = sharedPreference.getString(ENABLED_GROUP_IDS_KEY, "").toString()
+
+        currentSource = source
 
         VkApi.addMemesListener(this)
         VkApi.addRecommendedMemesListener(this)
@@ -32,8 +38,8 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         return isLoaded
     }
 
-    fun updateSharedPreference(sharedPreference: SharedPreferences) {
-        this.sharedPreference = sharedPreference
+    override fun setSource(source: Source) {
+        currentSource = source
     }
 
     override fun addUpdateListener(listener: IMemProvider.UpdateGroupListener) {
@@ -93,23 +99,29 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         saveEnabledGroup()
     }
 
-    override fun requestMemes(count: Int) {
-        if (source == 0) {
-            VkApi.requestMemes(enabledGroup, count, startFrom)
-        } else {
-            VkApi.requestRecommendedMemes(count, startFrom)
+    override fun requestMemes(count: Int, update: Boolean) {
+        when (currentSource) {
+            Source.NEWS ->
+                requestNews(count, update)
+            Source.RECOMMENDED ->
+                requestRecommended(count, update)
         }
     }
 
-    override fun cleatStartFrom() {
-        startFrom = ""
+    private fun requestNews(count: Int, update: Boolean) {
+        if (update) {
+            startFromNews = ""
+        }
+
+        VkApi.requestMemes(enabledGroup, count, startFromNews)
     }
 
-    private var source = 0
+    private fun requestRecommended(count: Int, update: Boolean) {
+        if (update) {
+            startFromRecommended = ""
+        }
 
-    override fun recommendedNews() {
-        source = 1
-        startFrom = ""
+        VkApi.requestRecommendedMemes(count, startFromRecommended)
     }
 
     override fun receiveGroup(answer: GroupAnswer) {
@@ -134,11 +146,19 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         }
     }
 
-    override fun receiveMemes(answer: MemesAnswer) {
-        startFrom = answer.nextFrom
+    override fun receiveNews(answer: MemesAnswer) {
+        startFromNews = answer.nextFrom
 
         for (listener in memListenerList) {
-            listener.receiveMemes(answer.memes)
+            listener.receiveNews(answer.memes)
+        }
+    }
+
+    override fun receiveRecommended(answer: MemesAnswer) {
+        startFromRecommended = answer.nextFrom
+
+        for (listener in memListenerList) {
+            listener.receiveRecommended(answer.memes)
         }
     }
 
@@ -165,8 +185,11 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         enabledGroupIds = ids
     }
 
+    fun updateSharedPreference(sharedPreference: SharedPreferences) {
+        this.sharedPreference = sharedPreference
+    }
+
     companion object {
-        private const val START_FROM_KEY = "start_from"
         private const val ENABLED_GROUP_IDS_KEY = "enabled_group_ids"
         const val FILE_NAME = "kek1"
     }

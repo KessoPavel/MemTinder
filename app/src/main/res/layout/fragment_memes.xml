@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.memView.MemView">
+    android:fitsSystemWindows="true"
+    tools:context=".ui.memView.MemView"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_mem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:orientation="vertical"
@@ -32,7 +38,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toLeftOf="@+id/update_button"
                     android:layout_toStartOf="@+id/update_button"
-                    android:src="@drawable/baseline_fast_rewind_24"
+                    android:src="@drawable/icon_fast_rewind_24"
                     app:backgroundTint="@android:color/white"
                     app:fabSize="auto"
                     app:rippleColor="#C4E2C4"/>
@@ -46,7 +52,7 @@
                     android:layout_marginRight="32dp"
                     android:layout_marginEnd="32dp"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/baseline_update_24"
+                    android:src="@drawable/icon_update_24"
                     app:backgroundTint="@android:color/white"
                     app:fabSize="normal"
                     app:rippleColor="#225BC9FA"/>
@@ -58,7 +64,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/update_button"
                     android:layout_toEndOf="@+id/update_button"
-                    android:src="@drawable/baseline_share_24"
+                    android:src="@drawable/icon_share_24"
                     app:backgroundTint="@android:color/white"
                     app:fabSize="auto"
                     app:rippleColor="#C4E2C4"/>
@@ -75,20 +81,8 @@
                 android:paddingStart="25dp"
                 android:paddingBottom="25dp"
                 android:clipToPadding="false"
-                tools:listitem="@layout/mem_view">
+                tools:listitem="@layout/item_mem">
             </com.yuyakaido.android.cardstackview.CardStackView>
-
-            <TextView
-                android:id="@+id/source"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="News"
-                android:textSize="30sp"
-                android:gravity="center"
-                android:textColor="#867D7D"/>
-
         </RelativeLayout>
-
     </LinearLayout>
-
-</androidx.drawerlayout.widget.DrawerLayout>
+</LinearLayout>

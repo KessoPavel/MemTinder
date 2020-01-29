@@ -9,7 +9,7 @@
         android:id="@+id/memView"
         android:name="com.radiance.memtinder.ui.memView.MemView"
         android:label="mem_view_fragment"
-        tools:layout="@layout/mem_view_fragment" >
+        tools:layout="@layout/fragment_memes" >
         <action
             android:id="@+id/action_memView_to_groupSetting"
             app:destination="@id/groupSetting"/>
@@ -18,7 +18,7 @@
         android:id="@+id/groupSetting"
         android:name="com.radiance.memtinder.ui.settings.GroupSetting"
         android:label="group_setting_fragment"
-        tools:layout="@layout/group_setting_fragment" >
+        tools:layout="@layout/fragment_settings" >
         <action
             android:id="@+id/action_groupSetting_to_memView"
             app:destination="@id/memView" />
