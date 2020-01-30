@@ -1,4 +1,4 @@
-package com.bsvt.memapi.core
+package com.radiance.core
 
 class Image private constructor(private val images: HashMap<Resolution, String>){
 
@@ -49,12 +49,8 @@ class Image private constructor(private val images: HashMap<Resolution, String>)
     }
 
     companion object {
-        private val emptyMap = hashMapOf(Pair(
-            Resolution(
-                0,
-                0
-            ), ""))
-        val baseImage =
+        private val emptyMap = hashMapOf(Pair(Resolution.empty, ""))
+        val empty =
             Image(emptyMap)
     }
 }

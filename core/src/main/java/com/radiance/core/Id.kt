@@ -1,4 +1,4 @@
-package com.bsvt.memapi.core
+package com.radiance.core
 
 class Id private constructor(private val id: Long){
 
@@ -25,6 +25,6 @@ class Id private constructor(private val id: Long){
     }
 
     companion object {
-        val baseId = Id(0)
+        val empty = Id(0)
     }
 }

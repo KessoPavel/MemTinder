@@ -1,4 +1,4 @@
-package com.bsvt.memapi.core
+package com.radiance.core
 
 class Source private constructor(
     private val name: String,
@@ -8,8 +8,8 @@ class Source private constructor(
 
     class Builder() {
         private var name: String = ""
-        private var avatar: Image = Image.baseImage
-        private var id: Id = Id.baseId
+        private var avatar: Image = Image.empty
+        private var id: Id = Id.empty
 
         fun name(name: String): Builder {
             this.name = name
@@ -29,5 +29,13 @@ class Source private constructor(
         fun build(): Source {
             return Source(name, avatar, id)
         }
+    }
+
+    companion object {
+        val empty = Source(
+            "",
+            Image.empty,
+            Id.empty
+        )
     }
 }

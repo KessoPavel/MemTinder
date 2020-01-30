@@ -1,2 +1,2 @@
-include ':app', ':memapi'
+include ':app', ':memapi', ':core', ':storage'
 rootProject.name='MemTinder'
