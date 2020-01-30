@@ -171,18 +171,32 @@ class MemView
         )
         viewModel.news.observe(this, Observer { addNewMemes(it) })
         viewModel.recommended.observe(this, Observer { addRecommended(it) })
+        viewModel.recommendedGroup.observe(this, Observer { addRecommendedGroup(it) })
+    }
+
+    private fun addRecommendedGroup(groups: List<VkGroup>?) {
+        groups?.let {
+            for (mem in recommendedAdapter.memes) {
+                if (mem.groupName == "") {
+                    mem.groupName = getGroupName(viewModel.recommendedGroup.value, mem.mem.sourceId)
+                    if (mem.groupName != "") {
+                        recommendedAdapter.notifyItemChanged(recommendedAdapter.memes.indexOf(mem))
+                    }
+                }
+            }
+        }
     }
 
     private fun addNewMemes(memes: ArrayList<VkMemes>?) {
         memes?.let {
-            newsAdapter.memes.addAll(memToCard(memes))
+            newsAdapter.memes.addAll(memToCard(viewModel.groupList.value, memes))
             newsAdapter.notifyItemInserted(newsAdapter.memes.size - memes.size)
         }
     }
 
     private fun addRecommended(memes: ArrayList<VkMemes>?) {
         memes?.let {
-            recommendedAdapter.memes.addAll(memToCard(memes))
+            recommendedAdapter.memes.addAll(memToCard(viewModel.recommendedGroup.value, memes))
             recommendedAdapter.notifyItemInserted(recommendedAdapter.memes.size - memes.size)
         }
     }
@@ -247,11 +261,11 @@ class MemView
     override fun onGroupClick(mem: MemCard) {
     }
 
-    private fun memToCard(memes: List<VkMemes>): List<MemCard> {
+    private fun memToCard(groupList: List<VkGroup>?, memes: List<VkMemes>): List<MemCard> {
         val answer = ArrayList<MemCard>()
 
         for (mem in memes) {
-            val groupName = getGroupName(viewModel.groupList.value, mem.sourceId)
+            val groupName = getGroupName(groupList, mem.sourceId)
             val image = mem.images[0].getBestResolutionImage()
             val imageCount = if (mem.images.size == 1) "" else mem.images.size.toString()
 
@@ -271,9 +285,15 @@ class MemView
 
     private fun getGroupName(groupList: List<VkGroup>?, sourceId: VkId): String {
         groupList?.let {
-            for (group in it) {
-                if (group.id.getGroupId() == sourceId.getGroupId())
-                    return group.name
+            try {
+                //todo create thread save array
+                for (group in it) {
+                    if (group.id.getGroupId() == sourceId.getGroupId())
+                        return group.name
+                }
+
+            } catch (e: ConcurrentModificationException) {
+
             }
         }
 

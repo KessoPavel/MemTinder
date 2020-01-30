@@ -7,7 +7,7 @@ import com.radiance.memtinder.vkapi.api.MemesAnswer
 import com.radiance.memtinder.vkapi.api.VkApi
 import com.radiance.memtinder.vkapi.group.VkGroup
 
-class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider, IVkApi.MemesListener, IVkApi.GroupListener, IVkApi.RecommendedMemesListener {
+class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider, IVkApi.MemesListener, IVkApi.GroupListener, IVkApi.RecommendedMemesListener, IVkApi.GroupInfoListener {
     private var startFromNews: String = ""
     private var startFromRecommended: String = ""
     private var currentSource: Source = Source.NEWS
@@ -16,6 +16,7 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
 
     private val groups = ArrayList<VkGroup>()
     private val enabledGroup = ArrayList<VkGroup>()
+    private val recommendedGroups = ArrayList<VkGroup>()
 
     private val updateListenerList = ArrayList<IMemProvider.UpdateGroupListener>()
     private val memListenerList = ArrayList<IMemProvider.MemListener>()
@@ -30,6 +31,7 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
         VkApi.addMemesListener(this)
         VkApi.addRecommendedMemesListener(this)
         VkApi.addGroupListener(this)
+        VkApi.addNewGroupListener(this)
 
         VkApi.requestGroups()
     }
@@ -72,6 +74,10 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
 
     override fun getEnabledGroup(): List<VkGroup> {
         return enabledGroup
+    }
+
+    override fun getRecommendedGroup(): List<VkGroup> {
+        return recommendedGroups
     }
 
     override fun enableMemFromGroup(group: VkGroup, enable: Boolean) {
@@ -157,9 +163,32 @@ class MemProvider(private var sharedPreference: SharedPreferences): IMemProvider
     override fun receiveRecommended(answer: MemesAnswer) {
         startFromRecommended = answer.nextFrom
 
+        for (news in answer.memes) {
+            val group = getRecommendedGroupById(news.sourceId.getGroupId())
+            if (group == null) {
+                VkApi.requestGroup(news.sourceId)
+            }
+        }
+
         for (listener in memListenerList) {
             listener.receiveRecommended(answer.memes)
         }
+    }
+
+    override fun receiveGroup(group: VkGroup) {
+        recommendedGroups.add(group)
+        for (listener in updateListenerList) {
+            listener.recommendedGroupUpdated()
+        }
+    }
+
+    private fun getRecommendedGroupById(id: String): VkGroup? {
+        for (group in recommendedGroups) {
+            if (group.id.getGroupId() == id) {
+                return group
+            }
+        }
+        return null
     }
 
     private fun getGroupBuyId(id: String): VkGroup? {

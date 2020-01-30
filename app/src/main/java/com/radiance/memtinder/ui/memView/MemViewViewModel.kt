@@ -24,6 +24,7 @@ class MemViewViewModel : ViewModel(),
     var news: MutableLiveData<ArrayList<VkMemes>> = MutableLiveData()
     var recommended: MutableLiveData<ArrayList<VkMemes>> = MutableLiveData()
     var groupList: MutableLiveData<List<VkGroup>> = MutableLiveData()
+    var recommendedGroup: MutableLiveData<List<VkGroup>> = MutableLiveData()
 
     init {
         news.value = ArrayList()
@@ -123,6 +124,14 @@ class MemViewViewModel : ViewModel(),
         if (loadCount != 0) {
             memProvider.requestMemes(loadCount)
             loadCount = 0
+        }
+    }
+
+    override fun recommendedGroupUpdated() {
+        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                recommendedGroup.value = memProvider.getRecommendedGroup()
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package com.radiance.memtinder.vkapi.api
 import android.app.Activity
 import android.content.SharedPreferences
 import com.radiance.memtinder.vkapi.group.VkGroup
+import com.radiance.memtinder.vkapi.id.VkId
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKApiConfig
 import com.vk.api.sdk.VKApiManager
@@ -10,6 +11,7 @@ import com.vk.api.sdk.VKTokenExpiredHandler
 import com.vk.api.sdk.auth.VKAccessToken
 import com.vk.api.sdk.auth.VKAuthCallback
 import com.vk.api.sdk.auth.VKScope
+import kotlinx.coroutines.newSingleThreadContext
 import kotlin.concurrent.fixedRateTimer
 
 object VkApi : IVkApi {
@@ -33,6 +35,7 @@ object VkApi : IVkApi {
     private val groupListenerList = ArrayList<IVkApi.GroupListener>()
     private val memesListenerList = ArrayList<IVkApi.MemesListener>()
     private val authorizationListener = ArrayList<IVkApi.AuthorizationListener>()
+    private val newGroupListener = ArrayList<IVkApi.GroupInfoListener>()
 
     private val recommendedMemesListenerList = ArrayList<IVkApi.RecommendedMemesListener>()
 
@@ -72,6 +75,10 @@ object VkApi : IVkApi {
 
     override fun requestRecommendedMemes(count: Int, startFrom: String) {
         VK.execute(RecommendedRequest(recommendedMemesListenerList, count, startFrom))
+    }
+
+    override fun requestGroup(id: VkId) {
+        VK.execute(GroupNameRequest(id, newGroupListener))
     }
 
     override fun addGroupListener(groupListener: IVkApi.GroupListener) {
@@ -119,6 +126,18 @@ object VkApi : IVkApi {
     override fun removeAuthorizationListener(listener: IVkApi.AuthorizationListener) {
         if (authorizationListener.contains(listener)) {
             authorizationListener.remove(listener)
+        }
+    }
+
+    override fun addNewGroupListener(listener: IVkApi.GroupInfoListener) {
+        if (!newGroupListener.contains(listener)){
+            newGroupListener.add(listener)
+        }
+    }
+
+    override fun removeNewGroupListener(listener: IVkApi.GroupInfoListener) {
+        if (newGroupListener.contains(listener)) {
+            newGroupListener.remove(listener)
         }
     }
 

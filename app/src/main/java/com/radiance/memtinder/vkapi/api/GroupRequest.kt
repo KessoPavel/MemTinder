@@ -42,7 +42,8 @@ class GroupRequest(private val listeners: ArrayList<IVkApi.GroupListener>): ApiC
                     .addImage(Resolution(100, 100), group.getString("photo_100"))
                     .addImage(Resolution(200, 200), group.getString("photo_200"))
                     .build()
-                val id = VkId(group.getLong("id"))
+
+                val id = VkId(-group.getLong("id"))
 
                 answer.add(VkGroup(group.getString("name"), avatar, id))
             }

@@ -3,6 +3,7 @@ package com.radiance.memtinder.vkapi.api
 import android.app.Activity
 import android.content.SharedPreferences
 import com.radiance.memtinder.vkapi.group.VkGroup
+import com.radiance.memtinder.vkapi.id.VkId
 
 interface IVkApi {
     fun authorization(activity: Activity)
@@ -11,6 +12,7 @@ interface IVkApi {
     fun requestGroups()
     fun requestMemes(groups: List<VkGroup>, count: Int, startFrom: String)
     fun requestRecommendedMemes(count: Int, startFrom: String)
+    fun requestGroup(id: VkId)
 
     fun addGroupListener(groupListener: GroupListener)
     fun removeGroupListener(groupListener: GroupListener)
@@ -20,6 +22,9 @@ interface IVkApi {
     fun removeRecommendedMemesListener(memesListener: RecommendedMemesListener)
     fun addAuthorizationListener(listener: AuthorizationListener)
     fun removeAuthorizationListener(listener: AuthorizationListener)
+
+    fun addNewGroupListener(listener: GroupInfoListener)
+    fun removeNewGroupListener(listener: GroupInfoListener)
 
     interface GroupListener {
         fun receiveGroup(answer: GroupAnswer)
@@ -35,5 +40,9 @@ interface IVkApi {
 
     interface AuthorizationListener {
         fun isAuthorized(boolean: Boolean)
+    }
+
+    interface GroupInfoListener {
+        fun receiveGroup(group: VkGroup)
     }
 }

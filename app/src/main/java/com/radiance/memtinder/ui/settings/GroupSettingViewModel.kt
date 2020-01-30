@@ -51,4 +51,8 @@ class GroupSettingViewModel : ViewModel(),  IMemProvider.UpdateGroupListener {
         groups.value = ArrayList(memProvider.getGroups())
         enabledGroup.value = ArrayList(memProvider.getEnabledGroup())
     }
+
+    override fun recommendedGroupUpdated() {
+
+    }
 }
