@@ -1,9 +1,9 @@
 package com.radiance.core
 
 class Source private constructor(
-    private val name: String,
-    private val avatar: Image,
-    private val id: Id
+    val name: String,
+    val avatar: Image,
+    val id: Id
 ) {
 
     class Builder() {

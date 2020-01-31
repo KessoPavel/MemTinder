@@ -10,6 +10,10 @@ class Id private constructor(private val id: Long){
         return id.toString()
     }
 
+    override fun equals(other: Any?): Boolean {
+        return this.id == (other as Id).id
+    }
+
     class Builder {
         fun fromString(string: String): Id {
             return Id(string.toLong())
