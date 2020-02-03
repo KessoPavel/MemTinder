@@ -6,36 +6,25 @@ class Source private constructor(
     val id: Id
 ) {
 
-    class Builder() {
+    class Builder {
         private var name: String = ""
         private var avatar: Image = Image.empty
         private var id: Id = Id.empty
 
-        fun name(name: String): Builder {
-            this.name = name
-            return this
-        }
+        fun name(name: String) = apply { this.name = name }
 
-        fun avatar(avatar: Image): Builder {
-            this.avatar = avatar
-            return this
-        }
+        fun avatar(avatar: Image) = apply { this.avatar = avatar }
 
-        fun id(id: Id): Builder {
-            this.id = id
-            return Builder()
-        }
+        fun id(id: Id) = apply{ this.id = id }
 
-        fun build(): Source {
-            return Source(name, avatar, id)
-        }
+        fun build() = Source(name, avatar, id)
     }
 
     companion object {
-        val empty = Source(
-            "",
-            Image.empty,
-            Id.empty
-        )
+        val empty = Builder()
+            .name("")
+            .avatar(Image.empty)
+            .id(Id.empty)
+            .build()
     }
 }

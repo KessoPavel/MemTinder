@@ -3,7 +3,8 @@ package com.radiance.storage
 import com.radiance.core.Id
 import com.radiance.core.Source
 
-class SourceFileStorage: SourceStorage {
+class SourceBaseStorage: SourceStorage {
+
     override fun save(source: Source) {
         if (!sources.contains(source)) {
             sources.add(source)

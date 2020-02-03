@@ -37,10 +37,8 @@ class Image private constructor(private val images: HashMap<Resolution, String>)
     class Builder {
         private var images: HashMap<Resolution, String> = HashMap()
 
-        fun addImage(resolution: Resolution, link: String): Builder {
+        fun addImage(resolution: Resolution, link: String) = apply {
             images[resolution] = link
-
-            return this
         }
 
         fun build(): Image {

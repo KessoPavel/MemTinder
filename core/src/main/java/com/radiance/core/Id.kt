@@ -15,20 +15,14 @@ class Id private constructor(private val id: Long){
     }
 
     class Builder {
-        fun fromString(string: String): Id {
-            return Id(string.toLong())
-        }
+        fun fromString(string: String) = Id(string.toLong())
 
-        fun fromLong(long: Long): Id {
-            return Id(long)
-        }
+        fun fromLong(long: Long) = Id(long)
 
-        fun fromInt(int: Int): Id {
-            return Id(int.toLong())
-        }
+        fun fromInt(int: Int) = Id(int.toLong())
     }
 
     companion object {
-        val empty = Id(0)
+        val empty = Builder().fromInt(0)
     }
 }
