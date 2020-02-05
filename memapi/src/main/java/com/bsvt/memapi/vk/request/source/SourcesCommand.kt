@@ -1,15 +1,18 @@
 package com.bsvt.memapi.vk.request.source
 
 import com.bsvt.memapi.vk.request.*
+import com.bsvt.memapi.vk.request.newsfeed.MemAnswer
 import com.radiance.core.Source
-import com.vk.api.sdk.VKApiManager
-import com.vk.api.sdk.VKApiResponseParser
-import com.vk.api.sdk.VKMethodCall
+import com.vk.api.sdk.*
 import com.vk.api.sdk.internal.ApiCommand
 import org.json.JSONException
 import org.json.JSONObject
 
 class SourcesCommand : ApiCommand<SourceAnswer>() {
+
+    fun execute(callback: VKApiCallback<SourceAnswer>) {
+        VK.execute(this, callback)
+    }
 
     override fun onExecute(manager: VKApiManager): SourceAnswer {
         val call = VKMethodCall.Builder()

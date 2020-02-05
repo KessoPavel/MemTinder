@@ -6,7 +6,7 @@ import com.radiance.core.Mem
 import com.radiance.core.Source
 
 interface MemApi {
-    fun toRegister(activity: Activity)
+    fun toRegister(activity: Activity, listener: AuthorizationListener)
     fun isRegistered(): Boolean
 
     fun requestMem(count: Int, fromStart: Boolean, sourceType: SourceType)
@@ -21,5 +21,9 @@ interface MemApi {
         fun sourcesUpdate()
         fun enabledSourcesUpdate()
         fun memes(sourceType: SourceType, memes: List<Mem>)
+    }
+
+    interface AuthorizationListener {
+        fun isAuthorize(authorize: Boolean)
     }
 }

@@ -2,14 +2,16 @@ package com.bsvt.memapi.vk.request.newsfeed
 
 import com.bsvt.memapi.vk.request.*
 import com.radiance.core.Mem
-import com.vk.api.sdk.VKApiManager
-import com.vk.api.sdk.VKApiResponseParser
-import com.vk.api.sdk.VKMethodCall
+import com.vk.api.sdk.*
 import com.vk.api.sdk.internal.ApiCommand
 import org.json.JSONException
 import org.json.JSONObject
 
 class NewsfeedCommand(private val request: NewsfeedRequest) : ApiCommand<MemAnswer>() {
+
+    fun execute(callback: VKApiCallback<MemAnswer>) {
+        VK.execute(this, callback)
+    }
 
     override fun onExecute(manager: VKApiManager): MemAnswer {
         var sourceId = ""
