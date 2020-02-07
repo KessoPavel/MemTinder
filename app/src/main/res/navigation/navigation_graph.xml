@@ -3,24 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_graph"
-    app:startDestination="@id/memView">
+    app:startDestination="@id/memSwipeFragment">
+
 
     <fragment
-        android:id="@+id/memView"
-        android:name="com.radiance.memtinder.ui.memView.MemView"
-        android:label="mem_view_fragment"
-        tools:layout="@layout/fragment_memes" >
-        <action
-            android:id="@+id/action_memView_to_groupSetting"
-            app:destination="@id/groupSetting"/>
-    </fragment>
-    <fragment
-        android:id="@+id/groupSetting"
-        android:name="com.radiance.memtinder.ui.settings.GroupSetting"
-        android:label="group_setting_fragment"
-        tools:layout="@layout/fragment_settings" >
-        <action
-            android:id="@+id/action_groupSetting_to_memView"
-            app:destination="@id/memView" />
-    </fragment>
+        android:id="@+id/memSwipeFragment"
+        android:name="com.radiance.memtinder.ui.mem.MemSwipeFragment"
+        android:label="MemSwipeFragment"
+        tools:layout="@layout/fragment_memes"/>
 </navigation>

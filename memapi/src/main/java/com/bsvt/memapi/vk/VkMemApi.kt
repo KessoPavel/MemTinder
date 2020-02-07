@@ -15,13 +15,16 @@ import com.vk.api.sdk.VKApiCallback
 
 class VkMemApi(private val storage: SourceStorage) : MemApi {
     private val listenerList = ArrayList<MemApi.MemApiListener>()
-    private val newsListener = MemListener(SourceType.NEWS, ArrayList())
-    private val recommendedListener = MemListener(SourceType.RECOMMENDED, ArrayList())
-
+    private val newsListener = MemListener(SourceType.NEWS, ArrayList(), storage, this)
+    private val recommendedListener = MemListener(SourceType.RECOMMENDED, ArrayList(), storage, this)
 
     override fun toRegister(activity: Activity, listener: MemApi.AuthorizationListener) {
-        if (VkApi.isAuthorize()) {
-            VkApi.authorization(activity, listener)
+        VkApi.addListener(listener)
+
+        if (!VkApi.isAuthorize()) {
+            VkApi.authorization(activity)
+        } else {
+            listener.isAuthorize(true)
         }
     }
 
@@ -118,7 +121,9 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
 
     class MemListener(
         private val sourceType: SourceType,
-        private var listenerList: ArrayList<MemApi.MemApiListener>
+        private var listenerList: ArrayList<MemApi.MemApiListener>,
+        private var storage: SourceStorage,
+        private val api: VkMemApi
     ) : VKApiCallback<MemAnswer> {
         var startFrom = ""
 
@@ -129,6 +134,16 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
         override fun success(result: MemAnswer) {
             startFrom = result.startFrom
 
+            if (sourceType == SourceType.RECOMMENDED) {
+                for (mem in result.memes) {
+                    val source = getSourceById(mem.sourceId)
+
+                    if (source == null) {
+                        api.requestSource(mem.sourceId)
+                    }
+                }
+            }
+
             listenerList.forEach {
                 it.memes(sourceType, result.memes)
             }
@@ -137,5 +152,15 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
         fun updateListenerList(listenerList: ArrayList<MemApi.MemApiListener>) {
             this.listenerList = listenerList
         }
+
+        private fun getSourceById(id: Id): Source? {
+            for (group in storage.getAll()) {
+                if (group.id.toLong() == id.toLong()) {
+                    return group
+                }
+            }
+            return null
+        }
+
     }
 }

@@ -1,31 +1,27 @@
-package com.radiance.memtinder.ui.memView
+package com.radiance.memtinder.ui.mem
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
+import com.bsvt.memapi.SourceType
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.radiance.core.Id
+import com.radiance.core.Image
+import com.radiance.core.Mem
+import com.radiance.core.Source
 import com.radiance.memtinder.R
-import com.radiance.memtinder.getBestResolutionImage
-import com.radiance.memtinder.memProvider.news.MemProvider
-import com.radiance.memtinder.memProvider.news.Source
-import com.radiance.memtinder.toRating
-import com.radiance.memtinder.ui.cardAdapter.CardSwipeAdapter
-import com.radiance.memtinder.ui.cardAdapter.MemCard
-import com.radiance.memtinder.ui.textViewer.TextViewer
-import com.radiance.memtinder.vkapi.group.VkGroup
-import com.radiance.memtinder.vkapi.id.VkId
-import com.radiance.memtinder.vkapi.image.VkImage
-import com.radiance.memtinder.vkapi.memes.VkMemes
+import com.radiance.memtinder.ui.mem.swipeAdapter.CardSwipeAdapter
+import com.radiance.memtinder.ui.mem.swipeAdapter.MemCard
+import com.radiance.memtinder.ui.text.MemText
 import com.stfalcon.imageviewer.StfalconImageViewer
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
@@ -34,12 +30,10 @@ import com.yuyakaido.android.cardstackview.StackFrom
 import kotlinx.android.synthetic.main.fragment_memes.*
 import kotlinx.android.synthetic.main.toolbar_mem.*
 
-class MemView
-    : Fragment(),
+class MemSwipeFragment : Fragment(),
     CardStackListener,
     CardSwipeAdapter.ClickListener {
-
-    private lateinit var viewModel: MemViewViewModel
+    private lateinit var viewModel: MemSwipeFragmentViewModel
 
     private lateinit var newsManager: CardStackLayoutManager
     private val newsAdapter: CardSwipeAdapter by lazy {
@@ -50,6 +44,7 @@ class MemView
         CardSwipeAdapter(ArrayList(), this)
     }
 
+    private lateinit var sourceType: SourceType
     private lateinit var manager: CardStackLayoutManager
     private lateinit var adapter: CardSwipeAdapter
 
@@ -65,10 +60,11 @@ class MemView
 
     override fun onResume() {
         super.onResume()
+
         initView()
         initViewModel()
 
-        viewModel.requestMem(requestCount, true)
+        viewModel.requestMem(requestCount, false, sourceType)
     }
 
     private fun initView() {
@@ -76,9 +72,11 @@ class MemView
         initRecommendedView()
 
         if (source_switch.isChecked) {
+            sourceType = SourceType.RECOMMENDED
             adapter = recommendedAdapter
             manager = recommendedManager
         } else {
+            sourceType = SourceType.NEWS
             adapter = newsAdapter
             manager = newsManager
         }
@@ -90,8 +88,7 @@ class MemView
             adapter.memes = ArrayList()
             adapter.notifyDataSetChanged()
 
-            viewModel.clear()
-            viewModel.requestMem(requestCount, true)
+            viewModel.requestMem(requestCount, true, sourceType)
         }
 
         share_button.setOnClickListener {
@@ -99,7 +96,7 @@ class MemView
 
             var shareString = mem.title
             for (image in mem.mem.images) {
-                shareString += "\n${image.getBestResolutionImage()}"
+                //shareString += "\n${image.getBestResolutionImage()}"
             }
 
             val sharingIntent = Intent(Intent.ACTION_SEND)
@@ -118,13 +115,12 @@ class MemView
         }
 
         source_switch.setOnClickListener {
-            val source: Source
             if (source_switch.isChecked) {
-                source = Source.RECOMMENDED
+                sourceType = SourceType.RECOMMENDED
                 manager = recommendedManager
                 adapter = recommendedAdapter
             } else {
-                source = Source.NEWS
+                sourceType = SourceType.NEWS
                 manager = newsManager
                 adapter = newsAdapter
             }
@@ -132,12 +128,11 @@ class MemView
             card_stack_view.layoutManager = manager
             card_stack_view.adapter = adapter
 
-            viewModel.setSource(source)
-            viewModel.requestMem(requestCount)
+            viewModel.requestMem(requestCount, false, sourceType)
         }
 
         settings.setOnClickListener{
-            findNavController().navigate(R.id.action_memView_to_groupSetting)
+            //findNavController().navigate(R.id.action_memView_to_groupSetting)
         }
     }
 
@@ -156,29 +151,37 @@ class MemView
         newsManager.setVisibleCount(visibleCount)
     }
 
+
     private fun initViewModel() {
-        viewModel = ViewModelProviders.of(this).get(MemViewViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(MemSwipeFragmentViewModel::class.java)
 
-        val source = if (source_switch.isChecked) {
-            Source.RECOMMENDED
-        } else {
-            Source.NEWS
-        }
-
-        viewModel.init(
-            context!!.getSharedPreferences(MemProvider.FILE_NAME, Context.MODE_PRIVATE),
-            source
-        )
-        viewModel.news.observe(this, Observer { addNewMemes(it) })
+        viewModel.newsfeed.observe(this, Observer { addNewMemes(it) })
         viewModel.recommended.observe(this, Observer { addRecommended(it) })
-        viewModel.recommendedGroup.observe(this, Observer { addRecommendedGroup(it) })
+        viewModel.sourcesList.observe(this, Observer { addSources(it) })
+        viewModel.enabledSourceList.observe(this, Observer { })
+
+        viewModel.login(activity!!)
     }
 
-    private fun addRecommendedGroup(groups: List<VkGroup>?) {
+    private fun addNewMemes(memes: ArrayList<Mem>?) {
+        memes?.let {
+            newsAdapter.memes.addAll(memToCard(viewModel.sourcesList.value, memes))
+            newsAdapter.notifyItemInserted(newsAdapter.memes.size - memes.size)
+        }
+    }
+
+    private fun addRecommended(memes: ArrayList<Mem>?) {
+        memes?.let {
+            recommendedAdapter.memes.addAll(memToCard(viewModel.sourcesList.value, memes))
+            recommendedAdapter.notifyItemInserted(recommendedAdapter.memes.size - memes.size)
+        }
+    }
+
+    private fun addSources(groups: List<Source>?) {
         groups?.let {
             for (mem in recommendedAdapter.memes) {
                 if (mem.groupName == "") {
-                    mem.groupName = getGroupName(viewModel.recommendedGroup.value, mem.mem.sourceId)
+                    mem.groupName = getGroupName(viewModel.sourcesList.value, mem.mem.sourceId)
                     if (mem.groupName != "") {
                         recommendedAdapter.notifyItemChanged(recommendedAdapter.memes.indexOf(mem))
                     }
@@ -187,86 +190,13 @@ class MemView
         }
     }
 
-    private fun addNewMemes(memes: ArrayList<VkMemes>?) {
-        memes?.let {
-            newsAdapter.memes.addAll(memToCard(viewModel.groupList.value, memes))
-            newsAdapter.notifyItemInserted(newsAdapter.memes.size - memes.size)
-        }
-    }
 
-    private fun addRecommended(memes: ArrayList<VkMemes>?) {
-        memes?.let {
-            recommendedAdapter.memes.addAll(memToCard(viewModel.recommendedGroup.value, memes))
-            recommendedAdapter.notifyItemInserted(recommendedAdapter.memes.size - memes.size)
-        }
-    }
-
-    override fun onCardDisappeared(view: View?, position: Int) {
-    }
-
-    override fun onCardDragging(direction: Direction?, ratio: Float) {
-    }
-
-    override fun onCardSwiped(direction: Direction?) {
-        val swipedMem = adapter.memes[manager.topPosition]
-        val rating = direction?.toRating()
-
-        if (rating != null) {
-            viewModel.setRating(swipedMem.mem, rating)
-        }
-
-        if ((adapter.memes.size - manager.topPosition) <= visibleCount) {
-            viewModel.requestMem(requestCount)
-        }
-    }
-
-    override fun onCardCanceled() {
-    }
-
-    override fun onCardAppeared(view: View?, position: Int) {
-    }
-
-    override fun onCardRewound() {
-    }
-
-
-    @SuppressLint("Range")
-    override fun onImageClick(mem: MemCard, imageView: ImageView) {
-        StfalconImageViewer.Builder<VkImage>(context, mem.mem.images, ::loadPosterImage)
-            .withBackgroundColor(Color.BLACK)
-            .withTransitionFrom(imageView)
-            .show()
-    }
-
-    private fun loadPosterImage(imageView: ImageView, image: VkImage?) {
-        imageView.apply {
-            Glide
-                .with(this)
-                .load(image?.getBestResolutionImage())
-                .placeholder(R.drawable.rounded_shape)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(imageView)
-        }
-    }
-
-    override fun onTextClick(mem: MemCard) {
-        activity?.supportFragmentManager?.let {
-            it.beginTransaction()
-                .add(R.id.nav_host_fragment, TextViewer.newInstance(mem.title))
-                .addToBackStack(null)
-                .commit()
-        }
-    }
-
-    override fun onGroupClick(mem: MemCard) {
-    }
-
-    private fun memToCard(groupList: List<VkGroup>?, memes: List<VkMemes>): List<MemCard> {
+    private fun memToCard(groupList: List<Source>?, memes: List<Mem>): List<MemCard> {
         val answer = ArrayList<MemCard>()
 
         for (mem in memes) {
             val groupName = getGroupName(groupList, mem.sourceId)
-            val image = mem.images[0].getBestResolutionImage()
+            val image = mem.images[0].getImageLink(mem.images[0].getHighResolution())!!
             val imageCount = if (mem.images.size == 1) "" else mem.images.size.toString()
 
             val memCard = MemCard(
@@ -283,12 +213,12 @@ class MemView
         return answer
     }
 
-    private fun getGroupName(groupList: List<VkGroup>?, sourceId: VkId): String {
+    private fun getGroupName(groupList: List<Source>?, sourceId: Id): String {
         groupList?.let {
             try {
                 //todo create thread save array
                 for (group in it) {
-                    if (group.id.getGroupId() == sourceId.getGroupId())
+                    if (group.id.toLong() == sourceId.toLong())
                         return group.name
                 }
 
@@ -299,4 +229,60 @@ class MemView
 
         return ""
     }
+
+
+    //region CardSwipe
+    override fun onCardDisappeared(view: View?, position: Int) {
+    }
+
+    override fun onCardDragging(direction: Direction?, ratio: Float) {
+    }
+
+    override fun onCardSwiped(direction: Direction?) {
+        val swipedMem = adapter.memes[manager.topPosition]
+        viewModel.setRating(swipedMem.mem)
+
+        if ((adapter.memes.size - manager.topPosition) <= visibleCount) {
+            viewModel.requestMem(requestCount, false, sourceType)
+        }
+    }
+
+    override fun onCardCanceled() {
+    }
+
+    override fun onCardAppeared(view: View?, position: Int) {
+    }
+
+    override fun onCardRewound() {
+    }
+    //endregion
+
+    //region CardClick
+    @SuppressLint("Range")
+    override fun onImageClick(mem: MemCard, imageView: ImageView) {
+        StfalconImageViewer.Builder<Image>(context, mem.mem.images, ::loadPosterImage)
+            .withBackgroundColor(Color.BLACK)
+            .withTransitionFrom(imageView)
+            .show()
+    }
+
+    private fun loadPosterImage(imageView: ImageView, image: Image?) {
+        imageView.apply {
+            Glide
+                .with(this)
+                .load(image?.getImageLink(image.getHighResolution()))
+                .placeholder(R.drawable.rounded_shape)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(imageView)
+        }
+    }
+
+    override fun onTextClick(mem: MemCard) {
+        activity?.supportFragmentManager?.beginTransaction()?.add(R.id.nav_host_fragment, MemText.newInstance(mem.title))
+            ?.addToBackStack(null)?.commit()
+    }
+
+    override fun onGroupClick(mem: MemCard) {
+    }
+    //endregion
 }

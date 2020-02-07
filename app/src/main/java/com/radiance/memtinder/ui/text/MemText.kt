@@ -1,6 +1,5 @@
-package com.radiance.memtinder.ui.textViewer
+package com.radiance.memtinder.ui.text
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,10 +9,10 @@ import android.view.ViewGroup
 import com.radiance.memtinder.R
 import kotlinx.android.synthetic.main.fragment_text_viewer.*
 
-class TextViewer : Fragment() {
+class MemText : Fragment() {
     companion object {
-        fun newInstance(text: String): TextViewer {
-            val fragment = TextViewer()
+        fun newInstance(text: String): MemText {
+            val fragment = MemText()
             fragment.text = text
             return fragment
         }

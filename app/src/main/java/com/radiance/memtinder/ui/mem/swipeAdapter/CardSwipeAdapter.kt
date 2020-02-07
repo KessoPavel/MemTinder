@@ -1,4 +1,4 @@
-package com.radiance.memtinder.ui.cardAdapter
+package com.radiance.memtinder.ui.mem.swipeAdapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +9,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.radiance.memtinder.R
 import com.radiance.memtinder.inflate
 import kotlinx.android.synthetic.main.item_mem.view.*
-import kotlinx.android.synthetic.main.item_mem.view.group_title
-import kotlinx.android.synthetic.main.item_mem.view.title
+
 
 class CardSwipeAdapter(
     var memes: ArrayList<MemCard>,

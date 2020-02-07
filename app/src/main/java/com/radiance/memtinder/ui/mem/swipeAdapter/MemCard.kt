@@ -1,11 +1,11 @@
-package com.radiance.memtinder.ui.cardAdapter
+package com.radiance.memtinder.ui.mem.swipeAdapter
 
-import com.radiance.memtinder.vkapi.memes.VkMemes
+import com.radiance.core.Mem
 
 data class MemCard(
     val url: String,
     val title: String,
     var groupName: String,
     val imagesCount: String,
-    val mem: VkMemes
+    val mem: Mem
 )

@@ -66,6 +66,8 @@ fun JSONObject.items() = kotlin.run { this.getJSONArray("items") }
 
 fun JSONObject.responce() = kotlin.run { this.getJSONObject("response") }
 
+fun JSONObject.responseArray() = kotlin.run { this.getJSONArray("response") }
+
 fun JSONObject.getMem(): Mem? {
     try {
         val text = this.text()

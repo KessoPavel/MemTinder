@@ -1,6 +1,7 @@
 package com.bsvt.memapi.vk
 
 import android.app.Activity
+import android.content.Intent
 import com.bsvt.memapi.MemApi
 import com.bsvt.memapi.vk.request.newsfeed.MemAnswer
 import com.bsvt.memapi.vk.request.newsfeed.NewsfeedCommand
@@ -12,18 +13,23 @@ import com.bsvt.memapi.vk.request.source.SourceInfoCommand
 import com.bsvt.memapi.vk.request.source.SourcesCommand
 import com.radiance.core.Id
 import com.radiance.core.Source
+import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKApiCallback
+import com.vk.api.sdk.auth.VKAccessToken
+import com.vk.api.sdk.auth.VKAuthCallback
 
 object VkApi {
+    private val listenerList = ArrayList<MemApi.AuthorizationListener>()
+
     fun authorization(
-        activity: Activity,
-        listener: MemApi.AuthorizationListener
+        activity: Activity
     ) {
-        //todo show authorization activity
+        val intent = Intent(activity, AuthorizationActivity::class.java)
+        activity.startActivity(intent)
     }
 
     fun isAuthorize(): Boolean {
-        return false
+        return VK.isLoggedIn()
     }
 
     fun requestSources(callback: VKApiCallback<SourceAnswer>) {
@@ -44,5 +50,23 @@ object VkApi {
     fun requestSource(id: Id, callback: VKApiCallback<Source>) {
         val sourceCommand = SourceInfoCommand(id)
         sourceCommand.execute(callback)
+    }
+
+    fun addListener(listener: MemApi.AuthorizationListener) {
+        if (!listenerList.contains(listener)) {
+            listenerList.add(listener)
+        }
+    }
+
+    fun removeListener(listener: MemApi.AuthorizationListener) {
+        if (listenerList.contains(listener)) {
+            listenerList.remove(listener)
+        }
+    }
+
+    fun authorizationSuccess(success: Boolean) {
+        listenerList.forEach{
+            it.isAuthorize(success)
+        }
     }
 }

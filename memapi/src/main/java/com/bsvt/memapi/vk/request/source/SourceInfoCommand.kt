@@ -4,6 +4,7 @@ import com.bsvt.memapi.vk.request.getSourceList
 import com.bsvt.memapi.vk.request.items
 import com.bsvt.memapi.vk.request.newsfeed.MemAnswer
 import com.bsvt.memapi.vk.request.responce
+import com.bsvt.memapi.vk.request.responseArray
 import com.radiance.core.Id
 import com.radiance.core.Source
 import com.vk.api.sdk.*
@@ -35,10 +36,7 @@ class SourceInfoCommand(private val id: Id) : ApiCommand<Source>() {
             response?.let {
                 try {
                     val responseJson = JSONObject(it)
-                    val responseObject = responseJson.responce()
-                    val sourceArray = responseObject.items()
-
-                    val sourceList = sourceArray.getSourceList()
+                    val sourceList = responseJson.responseArray().getSourceList()
                     if (sourceList.size == 1) {
                         return sourceList[0]
                     }

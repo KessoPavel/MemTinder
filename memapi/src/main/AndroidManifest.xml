@@ -1,2 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.bsvt.memapi" />
+    package="com.bsvt.memapi">
+
+    <application>
+        <activity android:name=".vk.AuthorizationActivity"></activity>
+        <activity
+            android:name=".vk.autorizationActivity.VkAuthorization"
+            android:label="@string/title_activity_vk_authorization"
+            android:theme="@style/AppTheme.NoActionBar" />
+    </application>
+
+</manifest>
