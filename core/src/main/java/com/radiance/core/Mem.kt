@@ -5,12 +5,14 @@ import android.service.quicksettings.Tile
 class Mem private constructor(
     val title: String,
     val images: List<Image>,
-    val sourceId: Id
+    val sourceId: Id,
+    val postId: String
 ) {
     class Builder {
         private var title: String = ""
         private var image = ArrayList<Image>()
         private var sourceId: Id = Id.empty
+        private var postId: String = ""
 
         fun title(title: String) = apply { this.title = title }
 
@@ -18,7 +20,9 @@ class Mem private constructor(
 
         fun sourceId(id: Id) = apply { this.sourceId = id }
 
-        fun build() = Mem(title, image, sourceId)
+        fun postId(postId: String) = apply { this.postId = postId }
+
+        fun build() = Mem(title, image, sourceId, postId)
     }
 
     companion object {
@@ -26,6 +30,7 @@ class Mem private constructor(
             .title("")
             .image(ArrayList<Image>().apply{ add(Image.empty)})
             .sourceId(Id.empty)
+            .postId("")
             .build()
     }
 }

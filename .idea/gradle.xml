@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/mark" />
             <option value="$PROJECT_DIR$/memapi" />
             <option value="$PROJECT_DIR$/storage" />
           </set>

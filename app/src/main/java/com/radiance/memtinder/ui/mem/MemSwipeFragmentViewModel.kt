@@ -5,13 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bsvt.memapi.MemApi
 import com.bsvt.memapi.SourceType
-import com.bsvt.memapi.vk.AuthorizationActivity
-import com.bsvt.memapi.vk.VkApi
 import com.bsvt.memapi.vk.VkMemApi
+import com.google.firebase.database.FirebaseDatabase
 import com.radiance.core.Mem
 import com.radiance.core.Source
 import com.radiance.storage.SourceStorage
 import com.radiance.storage.StorageDispatcher
+
 
 class MemSwipeFragmentViewModel: ViewModel(), MemApi.MemApiListener {
     val newsfeed: MutableLiveData<ArrayList<Mem>> = MutableLiveData()
@@ -60,8 +60,15 @@ class MemSwipeFragmentViewModel: ViewModel(), MemApi.MemApiListener {
         }
     }
 
-    fun setRating(mem: Mem) {
+    fun setRating(
+        mem: Mem,
+        rating: String
+    ) {
+        val database = FirebaseDatabase.getInstance()
+        val myRef = database.getReference("memRating")
 
+        val id = "${mem.sourceId.toLong()}_${mem.postId}"
+        myRef.child(id).setValue(rating)
     }
 
     override fun subscriptionUpdate() {

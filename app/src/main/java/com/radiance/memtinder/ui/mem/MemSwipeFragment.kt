@@ -245,7 +245,14 @@ class MemSwipeFragment : Fragment(),
 
     override fun onCardSwiped(direction: Direction?) {
         val swipedMem = adapter.memes[manager.topPosition]
-        viewModel.setRating(swipedMem.mem)
+
+        val rating = when(direction) {
+            Direction.Right -> "like"
+            Direction.Left -> "dislike"
+            else -> "unknown"
+        }
+
+        viewModel.setRating(swipedMem.mem, rating)
 
         if ((adapter.memes.size - manager.topPosition) <= visibleCount) {
             viewModel.requestMem(requestCount, false, sourceType)

@@ -73,7 +73,10 @@ fun JSONObject.getMem(): Mem? {
         val text = this.text()
 
         val attachment = this.attachments()
+        val postId = this.getString("post_id")
+
         val attachmentPhotos = attachment.getAttachments()
+
 
         val id = this.sourceId()
         val sourceId = Id.Builder().fromString(id)
@@ -83,6 +86,7 @@ fun JSONObject.getMem(): Mem? {
                 .title(text)
                 .image(attachmentPhotos)
                 .sourceId(sourceId)
+                .postId(postId)
                 .build()
         }
 

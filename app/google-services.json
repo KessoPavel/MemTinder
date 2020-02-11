@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "191136154723",
+    "firebase_url": "https://memtinder-75f42.firebaseio.com",
+    "project_id": "memtinder-75f42",
+    "storage_bucket": "memtinder-75f42.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:191136154723:android:225d0dc376855e21992456",
+        "android_client_info": {
+          "package_name": "com.radiance.memtinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "191136154723-ecgfqa4rrrpabei5o4fdcn64au8gjsfn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.radiance.memtinder",
+            "certificate_hash": "1d245ae8e167f1edc496b6cf3cce6b6da84d1317"
+          }
+        },
+        {
+          "client_id": "191136154723-ktb6cn61800l0ctau4joeb5dudfbg8cf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.radiance.memtinder",
+            "certificate_hash": "b26dea674cee8c5661a2dccaded895e521fbca95"
+          }
+        },
+        {
+          "client_id": "191136154723-aaga7ouqnip2ivknit3f5qmqc2mc8moo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBk6_GXZXxr7ZvArm0Q-legKiVLJQ14y7k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "191136154723-aaga7ouqnip2ivknit3f5qmqc2mc8moo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
