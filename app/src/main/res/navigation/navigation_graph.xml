@@ -10,5 +10,14 @@
         android:id="@+id/memSwipeFragment"
         android:name="com.radiance.memtinder.ui.mem.MemSwipeFragment"
         android:label="MemSwipeFragment"
-        tools:layout="@layout/fragment_memes"/>
+        tools:layout="@layout/fragment_memes">
+        <action
+            android:id="@+id/open_settings"
+            app:destination="@id/sourceSettingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/sourceSettingsFragment"
+        android:name="com.radiance.memtinder.ui.group.SourceSettingsFragment"
+        android:label="SourceSettingsFragment"
+        tools:layout="@layout/fragment_settings"/>
 </navigation>

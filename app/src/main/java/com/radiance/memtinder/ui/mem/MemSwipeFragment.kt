@@ -11,6 +11,7 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.bsvt.memapi.SourceType
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -132,7 +133,7 @@ class MemSwipeFragment : Fragment(),
         }
 
         settings.setOnClickListener{
-            //findNavController().navigate(R.id.action_memView_to_groupSetting)
+            findNavController().navigate(R.id.open_settings)
         }
     }
 
@@ -157,6 +158,7 @@ class MemSwipeFragment : Fragment(),
 
         viewModel.newsfeed.observe(this, Observer { addNewMemes(it) })
         viewModel.recommended.observe(this, Observer { addRecommended(it) })
+        viewModel.subscriptionList.observe(this, Observer { addSubscription(it) })
         viewModel.sourcesList.observe(this, Observer { addSources(it) })
         viewModel.enabledSourceList.observe(this, Observer { })
 
@@ -165,7 +167,7 @@ class MemSwipeFragment : Fragment(),
 
     private fun addNewMemes(memes: ArrayList<Mem>?) {
         memes?.let {
-            newsAdapter.memes.addAll(memToCard(viewModel.sourcesList.value, memes))
+            newsAdapter.memes.addAll(memToCard(viewModel.subscriptionList.value, memes))
             newsAdapter.notifyItemInserted(newsAdapter.memes.size - memes.size)
         }
     }
@@ -175,6 +177,10 @@ class MemSwipeFragment : Fragment(),
             recommendedAdapter.memes.addAll(memToCard(viewModel.sourcesList.value, memes))
             recommendedAdapter.notifyItemInserted(recommendedAdapter.memes.size - memes.size)
         }
+    }
+
+    private fun addSubscription(groups: List<Source>?) {
+
     }
 
     private fun addSources(groups: List<Source>?) {
@@ -216,7 +222,6 @@ class MemSwipeFragment : Fragment(),
     private fun getGroupName(groupList: List<Source>?, sourceId: Id): String {
         groupList?.let {
             try {
-                //todo create thread save array
                 for (group in it) {
                     if (group.id.toLong() == sourceId.toLong())
                         return group.name

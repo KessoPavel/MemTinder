@@ -65,8 +65,8 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
             }
 
             override fun success(result: SourceAnswer) {
-                storage.saveAll(result.sources)
-                notifySourceChange()
+                storage.saveAllSubscription(result.sources)
+                notifySubscriptionsChange()
             }
         })
     }
@@ -85,7 +85,7 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
     }
 
     override fun enabledSource(source: Source, enabled: Boolean) {
-        storage.enableSource(source.id, enabled)
+        storage.enableSource(source, enabled)
         notifyEnabledSourceChange()
     }
 
@@ -106,6 +106,30 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
             recommendedListener.updateListenerList(listenerList)
         }
     }
+
+    override fun disabledAll() {
+        for (source in storage.getSubsctiption()) {
+            storage.enableSource(source, false)
+        }
+
+        notifyEnabledSourceChange()
+    }
+
+    override fun enabledAll() {
+        for (source in storage.getSubsctiption()) {
+            storage.enableSource(source, true)
+        }
+
+        notifyEnabledSourceChange()
+    }
+
+
+    private fun notifySubscriptionsChange() {
+        listenerList.forEach {
+            it.subscriptionUpdate()
+        }
+    }
+
 
     private fun notifySourceChange() {
         listenerList.forEach {

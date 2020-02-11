@@ -16,8 +16,11 @@ interface MemApi {
 
     fun addStateListener(listener: MemApiListener)
     fun removeStateListener(listener: MemApiListener)
+    fun disabledAll()
+    fun enabledAll()
 
     interface MemApiListener {
+        fun subscriptionUpdate()
         fun sourcesUpdate()
         fun enabledSourcesUpdate()
         fun memes(sourceType: SourceType, memes: List<Mem>)

@@ -4,6 +4,10 @@ import com.radiance.core.Id
 import com.radiance.core.Source
 
 interface SourceStorage {
+    fun saveSubscription(source: Source)
+    fun saveAllSubscription(sourceList: List<Source>)
+    fun getSubsctiption(): List<Source>
+
     fun save(source: Source)
     fun saveAll(sourceList: List<Source>)
 
@@ -13,6 +17,6 @@ interface SourceStorage {
     fun delete(id: Id)
     fun deleteAll()
 
-    fun enableSource(id: Id, enable: Boolean)
+    fun enableSource(source: Source, enable: Boolean)
     fun getEnabledSource(): List<Source>
 }

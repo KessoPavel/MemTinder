@@ -16,6 +16,7 @@ import com.radiance.storage.StorageDispatcher
 class MemSwipeFragmentViewModel: ViewModel(), MemApi.MemApiListener {
     val newsfeed: MutableLiveData<ArrayList<Mem>> = MutableLiveData()
     val recommended: MutableLiveData<ArrayList<Mem>> = MutableLiveData()
+    val subscriptionList: MutableLiveData<ArrayList<Source>> = MutableLiveData()
     val sourcesList: MutableLiveData<ArrayList<Source>> = MutableLiveData()
     val enabledSourceList: MutableLiveData<ArrayList<Source>> = MutableLiveData()
 
@@ -61,6 +62,10 @@ class MemSwipeFragmentViewModel: ViewModel(), MemApi.MemApiListener {
 
     fun setRating(mem: Mem) {
 
+    }
+
+    override fun subscriptionUpdate() {
+        subscriptionList.value = ArrayList(storage.getSubsctiption())
     }
 
     override fun sourcesUpdate() {

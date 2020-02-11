@@ -3,7 +3,23 @@ package com.radiance.storage
 import com.radiance.core.Id
 import com.radiance.core.Source
 
-class SourceBaseStorage: SourceStorage {
+class SourceBaseStorage : SourceStorage {
+
+    override fun saveSubscription(source: Source) {
+        if (!subscription.contains(source)) {
+            subscription.add(source)
+        }
+    }
+
+    override fun saveAllSubscription(sourceList: List<Source>) {
+        for (source in sourceList) {
+            saveSubscription(source)
+        }
+    }
+
+    override fun getSubsctiption(): List<Source> {
+        return subscription
+    }
 
     override fun save(source: Source) {
         if (!sources.contains(source)) {
@@ -45,17 +61,13 @@ class SourceBaseStorage: SourceStorage {
         enabledSource.clear()
     }
 
-    override fun enableSource(id: Id, enable: Boolean) {
-        val source = getById(id)
-
-        source?.let {
-            if (enable) {
-                if (!enabledSource.contains(it)) {
-                    enabledSource.add(it)
-                } else {
-                    enabledSource.remove(it)
-                }
+    override fun enableSource(source: Source, enable: Boolean) {
+        if (enable) {
+            if (!enabledSource.contains(source)) {
+                enabledSource.add(source)
             }
+        } else {
+            enabledSource.remove(source)
         }
     }
 
@@ -64,6 +76,7 @@ class SourceBaseStorage: SourceStorage {
     }
 
     companion object {
+        private val subscription: ArrayList<Source> = ArrayList()
         private val sources: ArrayList<Source> = ArrayList()
         private val enabledSource: ArrayList<Source> = ArrayList()
     }
