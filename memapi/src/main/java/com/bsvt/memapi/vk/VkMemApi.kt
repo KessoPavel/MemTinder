@@ -78,7 +78,7 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
             }
 
             override fun success(result: Source) {
-                storage.save(result)
+                storage.saveRecommendation(result)
                 notifySourceChange()
             }
         })
@@ -108,7 +108,7 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
     }
 
     override fun disabledAll() {
-        for (source in storage.getSubsctiption()) {
+        for (source in storage.getSubscription()) {
             storage.enableSource(source, false)
         }
 
@@ -116,7 +116,7 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
     }
 
     override fun enabledAll() {
-        for (source in storage.getSubsctiption()) {
+        for (source in storage.getSubscription()) {
             storage.enableSource(source, true)
         }
 
@@ -159,8 +159,9 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
             startFrom = result.startFrom
 
             if (sourceType == SourceType.RECOMMENDED) {
+                val sources = ArrayList(storage.getAllRecommendation())
                 for (mem in result.memes) {
-                    val source = getSourceById(mem.sourceId)
+                    val source = getSourceById(sources, mem.sourceId)
 
                     if (source == null) {
                         api.requestSource(mem.sourceId)
@@ -177,8 +178,8 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
             this.listenerList = listenerList
         }
 
-        private fun getSourceById(id: Id): Source? {
-            for (group in storage.getAll()) {
+        private fun getSourceById(sources: ArrayList<Source>, id: Id): Source? {
+            for (group in sources) {
                 if (group.id.toLong() == id.toLong()) {
                     return group
                 }

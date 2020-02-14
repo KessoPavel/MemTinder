@@ -9,6 +9,7 @@ import com.bsvt.memapi.vk.VkMemApi
 import com.google.firebase.database.FirebaseDatabase
 import com.radiance.core.Mem
 import com.radiance.core.Source
+import com.radiance.memtinder.login.Login
 import com.radiance.storage.SourceStorage
 import com.radiance.storage.StorageDispatcher
 
@@ -28,12 +29,14 @@ class MemSwipeFragmentViewModel: ViewModel(), MemApi.MemApiListener {
     var fromStart = false
     var sourceType = SourceType.NEWS
 
+    var isRequested = false
+
 
     fun login(activity: Activity) {
-        storage = StorageDispatcher().createStorage(StorageDispatcher.Storage.BASE)
+        storage = StorageDispatcher().createStorage(activity.applicationContext, StorageDispatcher.Storage.ROOM)
 
-        val sourceStorage = StorageDispatcher().createStorage(StorageDispatcher.Storage.BASE)
-        memProvider = VkMemApi(sourceStorage)
+       // val sourceStorage = StorageDispatcher().createStorage(StorageDispatcher.Storage.BASE)
+        memProvider = VkMemApi(storage)
 
         memProvider.addStateListener(this)
 
@@ -51,7 +54,10 @@ class MemSwipeFragmentViewModel: ViewModel(), MemApi.MemApiListener {
 
     fun requestMem(count: Int, fromStart: Boolean, source: SourceType) {
         if (memProvider.isRegistered()) {
-            memProvider.requestMem(count, fromStart, source)
+            if (!isRequested) {
+                isRequested = true
+                memProvider.requestMem(count, fromStart, source)
+            }
         } else {
             request = true
             this.count = count
@@ -64,19 +70,24 @@ class MemSwipeFragmentViewModel: ViewModel(), MemApi.MemApiListener {
         mem: Mem,
         rating: String
     ) {
+        var ref = Login.account?.displayName
+        if (ref == null) ref = "memRating"
+
+
         val database = FirebaseDatabase.getInstance()
-        val myRef = database.getReference("memRating")
+        val myRef = database.getReference(ref)
+
 
         val id = "${mem.sourceId.toLong()}_${mem.postId}"
         myRef.child(id).setValue(rating)
     }
 
     override fun subscriptionUpdate() {
-        subscriptionList.value = ArrayList(storage.getSubsctiption())
+        subscriptionList.value = ArrayList(storage.getSubscription())
     }
 
     override fun sourcesUpdate() {
-        sourcesList.value = ArrayList(storage.getAll())
+        sourcesList.value = ArrayList(storage.getAllRecommendation())
         enabledSourceList.value = ArrayList(storage.getEnabledSource())
     }
 
@@ -89,5 +100,6 @@ class MemSwipeFragmentViewModel: ViewModel(), MemApi.MemApiListener {
             SourceType.NEWS -> newsfeed.value = ArrayList(memes)
             SourceType.RECOMMENDED -> recommended.value = ArrayList(memes)
         }
+        isRequested = false
     }
 }

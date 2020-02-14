@@ -17,23 +17,23 @@ class SourceBaseStorage : SourceStorage {
         }
     }
 
-    override fun getSubsctiption(): List<Source> {
+    override fun getSubscription(): List<Source> {
         return subscription
     }
 
-    override fun save(source: Source) {
+    override fun saveRecommendation(source: Source) {
         if (!sources.contains(source)) {
             sources.add(source)
         }
     }
 
-    override fun saveAll(sourceList: List<Source>) {
+    override fun saveAllRecommendation(sourceList: List<Source>) {
         for (source in sourceList) {
-            save(source)
+            saveRecommendation(source)
         }
     }
 
-    override fun getById(id: Id): Source? {
+    override fun getRecommendationById(id: Id): Source? {
         for (source in sources) {
             if (source.id == id) {
                 return source
@@ -42,7 +42,7 @@ class SourceBaseStorage : SourceStorage {
         return null
     }
 
-    override fun getAll(): List<Source> {
+    override fun getAllRecommendation(): List<Source> {
         return sources
     }
 

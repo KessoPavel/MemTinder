@@ -6,6 +6,8 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'com.google.gms.google-services'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -63,6 +65,13 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.2.2'
     implementation 'com.google.firebase:firebase-database-ktx:19.2.1'
     implementation 'com.google.firebase:firebase-auth:19.2.0'
+
+    implementation 'com.google.firebase:firebase-auth:19.2.0'
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'
+
+    //room - storage dependency
+    def room_version = "2.2.3"
+    annotationProcessor "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
 
     //tests
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'

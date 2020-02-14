@@ -20,6 +20,10 @@ class Source private constructor(
         fun build() = Source(name, avatar, id)
     }
 
+    override fun equals(other: Any?): Boolean {
+        return this.id == (other as Source).id
+    }
+
     companion object {
         val empty = Builder()
             .name("")

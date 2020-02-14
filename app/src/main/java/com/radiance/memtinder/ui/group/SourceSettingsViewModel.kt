@@ -19,15 +19,15 @@ class SourceSettingsViewModel: ViewModel(), MemApi.MemApiListener {
     val enabledSources: MutableLiveData<ArrayList<Source>> = MutableLiveData()
 
     fun init(activity: Activity) {
-        storage = StorageDispatcher().createStorage(StorageDispatcher.Storage.BASE)
+        storage = StorageDispatcher().createStorage(activity.applicationContext, StorageDispatcher.Storage.ROOM)
 
-        val sourceStorage = StorageDispatcher().createStorage(StorageDispatcher.Storage.BASE)
-        memProvider = VkMemApi(sourceStorage)
+        //val sourceStorage = StorageDispatcher().createStorage(StorageDispatcher.Storage.BASE)
+        memProvider = VkMemApi(storage)
 
         memProvider.addStateListener(this)
 
         if (memProvider.isRegistered()) {
-            sources.value = ArrayList(storage.getSubsctiption())
+            sources.value = ArrayList(storage.getSubscription())
             enabledSources.value = ArrayList(storage.getEnabledSource())
         } else {
             memProvider.toRegister(activity, object : MemApi.AuthorizationListener {
@@ -51,7 +51,7 @@ class SourceSettingsViewModel: ViewModel(), MemApi.MemApiListener {
     }
 
     override fun subscriptionUpdate() {
-        sources.value = ArrayList(storage.getSubsctiption())
+        sources.value = ArrayList(storage.getSubscription())
     }
 
     override fun sourcesUpdate() {
