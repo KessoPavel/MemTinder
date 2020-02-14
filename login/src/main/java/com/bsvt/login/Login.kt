@@ -1,4 +1,4 @@
-package com.radiance.memtinder.login
+package com.bsvt.login
 
 import android.app.Activity
 import android.content.Intent

@@ -7,6 +7,7 @@ interface SourceStorage {
     fun saveSubscription(source: Source)
     fun saveAllSubscription(sourceList: List<Source>)
     fun getSubscription(): List<Source>
+    fun clearSubscription()
 
     fun saveRecommendation(source: Source)
     fun saveAllRecommendation(sourceList: List<Source>)

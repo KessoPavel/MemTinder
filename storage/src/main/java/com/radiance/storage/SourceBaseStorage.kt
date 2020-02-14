@@ -27,6 +27,10 @@ class SourceBaseStorage : SourceStorage {
         }
     }
 
+    override fun clearSubscription() {
+        sources.clear()
+    }
+
     override fun saveAllRecommendation(sourceList: List<Source>) {
         for (source in sourceList) {
             saveRecommendation(source)

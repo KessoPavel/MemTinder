@@ -65,6 +65,7 @@ class VkMemApi(private val storage: SourceStorage) : MemApi {
             }
 
             override fun success(result: SourceAnswer) {
+                storage.clearSubscription()
                 storage.saveAllSubscription(result.sources)
                 notifySubscriptionsChange()
             }

@@ -11,10 +11,6 @@ import com.radiance.storage.room.entity.EnabledId
 class RoomStorage(context: Context) : SourceStorage {
     var db: SourceDataBase = Room.databaseBuilder(context, SourceDataBase::class.java, "sources_data_base").allowMainThreadQueries().build()
 
-    init {
-        db.subscriptionDao().deleteAll()
-    }
-
     override fun saveSubscription(source: Source) {
         db.subscriptionDao().insertAll(source.toSubDao())
     }
@@ -34,6 +30,10 @@ class RoomStorage(context: Context) : SourceStorage {
         }
 
         return answer
+    }
+
+    override fun clearSubscription() {
+        db.subscriptionDao().deleteAll()
     }
 
     override fun saveRecommendation(source: Source) {

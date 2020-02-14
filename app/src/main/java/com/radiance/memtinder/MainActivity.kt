@@ -3,8 +3,7 @@ package com.radiance.memtinder
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.bsvt.memapi.vk.VkApi
-import com.radiance.memtinder.login.Login
+import com.bsvt.login.Login
 
 
 class MainActivity :
