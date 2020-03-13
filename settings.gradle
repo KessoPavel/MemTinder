@@ -1,2 +1,3 @@
 include ':app', ':memapi', ':core', ':storage', ':mark', ':login'
 rootProject.name='MemTinder'
+include ':sourcestorage'
