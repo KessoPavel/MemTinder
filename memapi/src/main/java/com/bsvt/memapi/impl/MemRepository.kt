@@ -1,12 +1,17 @@
 package com.bsvt.memapi.impl
 
 import android.app.Activity
+import android.content.Context
 import com.bsvt.memapi.contract.MemApi
 import com.bsvt.memapi.vk.request.newsfeed.NewsfeedRequest
 import com.bsvt.memapi.vk.request.recommended.RecommendedRequest
 import com.radiance.core.Id
 import com.radiance.core.Mem
 import com.radiance.core.Source
+import com.radiance.sourcestorage.contract.SourceStorage
+import com.radiance.sourcestorage.db.entity.SourceEntity
+import com.radiance.sourcestorage.db.entity.SourceStatus
+import com.radiance.sourcestorage.impl.RoomSourceStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,16 +20,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
-class VkMemApi : MemApi {
+class MemRepository(context: Context) : MemApi {
     private val scope = CoroutineScope(Dispatchers.Default)
     private var newsStartFrom = ""
     private var newsStep = 10
     private var recommendedStartFrom = ""
     private var recommendedStep = 10
 
+    private val sourceStorage: SourceStorage = RoomSourceStorage(context)
+
     private val newsChannel = Channel<Mem>()
     private val recommendedChannel = Channel<Mem>()
-    private val sourceChannel = Channel<List<Source>>()
     private val sourceInfoChannel = Channel<Source>()
 
     init {
@@ -45,7 +51,6 @@ class VkMemApi : MemApi {
         return VkApi.isAuthorize()
     }
 
-    @ExperimentalCoroutinesApi
     override fun startMemFlow(step: Int, fromStart: Boolean): Flow<Mem> {
         newsStep = step
         val startFrom = if (fromStart) "" else newsStartFrom
@@ -72,14 +77,10 @@ class VkMemApi : MemApi {
         }
     }
 
-    override fun requestSources(): Flow<List<Source>> {
+    override fun requestSources(): Flow<List<SourceEntity>> {
         VkApi.requestSources()
 
-        return flow {
-            for (sources in sourceChannel) {
-                emit(sources)
-            }
-        }
+        return sourceStorage.getAllSource()
     }
 
     override suspend fun requestSource(id: Id): Flow<Source> {
@@ -93,7 +94,9 @@ class VkMemApi : MemApi {
     }
 
     override suspend fun enabledSource(source: Source, enabled: Boolean) {
-        TODO("not implemented")
+        val entity = source.toEntity()
+        entity.status = if (enabled) SourceStatus.Enabled else SourceStatus.Unknown
+        sourceStorage.updateAllSource(entity)
     }
 
     private fun requestNews(step: Int, startFrom: String) {
@@ -144,7 +147,9 @@ class VkMemApi : MemApi {
     private fun listenSourceChannel() {
         scope.launch {
             for (answer in VkApi.sourceChannel) {
-                sourceChannel.send(answer.sources)
+                answer.sources.toEntity().forEach {
+                    sourceStorage.updateAllSource(it)
+                }
             }
         }
     }

@@ -30,10 +30,16 @@ import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.StackFrom
 import kotlinx.android.synthetic.main.fragment_memes.*
 import kotlinx.android.synthetic.main.toolbar_mem.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 
 class MemSwipeFragment : Fragment(),
     CardStackListener,
     CardSwipeAdapter.ClickListener {
+    private val scope = CoroutineScope(Dispatchers.IO)
+
     private lateinit var viewModel: MemSwipeFragmentViewModel
 
     private lateinit var newsManager: CardStackLayoutManager
@@ -59,13 +65,16 @@ class MemSwipeFragment : Fragment(),
         return inflater.inflate(R.layout.fragment_memes, container, false)
     }
 
+    @ExperimentalCoroutinesApi
     override fun onResume() {
         super.onResume()
 
         initView()
         initViewModel()
 
-        viewModel.requestMem(requestCount, false, sourceType)
+        scope.launch {
+            viewModel.requestMem(requestCount, false, sourceType)
+        }
     }
 
     private fun initView() {
@@ -89,7 +98,9 @@ class MemSwipeFragment : Fragment(),
             adapter.memes = ArrayList()
             adapter.notifyDataSetChanged()
 
-            viewModel.requestMem(requestCount, true, sourceType)
+            scope.launch {
+                viewModel.requestMem(requestCount, true, sourceType)
+            }
         }
 
         share_button.setOnClickListener {
@@ -129,7 +140,9 @@ class MemSwipeFragment : Fragment(),
             card_stack_view.layoutManager = manager
             card_stack_view.adapter = adapter
 
-            viewModel.requestMem(requestCount, false, sourceType)
+            scope.launch {
+                viewModel.requestMem(requestCount, false, sourceType)
+            }
         }
 
         settings.setOnClickListener{
@@ -158,16 +171,17 @@ class MemSwipeFragment : Fragment(),
 
         viewModel.newsfeed.observe(this, Observer { addNewMemes(it) })
         viewModel.recommended.observe(this, Observer { addRecommended(it) })
-        viewModel.subscriptionList.observe(this, Observer { addSubscription(it) })
         viewModel.sourcesList.observe(this, Observer { addSources(it) })
         viewModel.enabledSourceList.observe(this, Observer { })
 
-        viewModel.login(activity!!)
+        scope.launch {
+            viewModel.login(activity!!)
+        }
     }
 
     private fun addNewMemes(memes: ArrayList<Mem>?) {
         memes?.let {
-            newsAdapter.memes.addAll(memToCard(viewModel.subscriptionList.value, memes))
+            newsAdapter.memes.addAll(memToCard(viewModel.sourcesList.value, memes))
             newsAdapter.notifyItemInserted(newsAdapter.memes.size - memes.size)
         }
     }
@@ -243,6 +257,7 @@ class MemSwipeFragment : Fragment(),
     override fun onCardDragging(direction: Direction?, ratio: Float) {
     }
 
+    @ExperimentalCoroutinesApi
     override fun onCardSwiped(direction: Direction?) {
         val swipedMem = adapter.memes[manager.topPosition]
 
@@ -255,7 +270,9 @@ class MemSwipeFragment : Fragment(),
         viewModel.setRating(swipedMem.mem, rating)
 
         if ((adapter.memes.size - manager.topPosition) <= visibleCount) {
-            viewModel.requestMem(requestCount, false, sourceType)
+            scope.launch {
+                viewModel.requestMem(requestCount, false, sourceType)
+            }
         }
     }
 

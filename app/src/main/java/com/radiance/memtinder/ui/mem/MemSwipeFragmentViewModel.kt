@@ -5,65 +5,78 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bsvt.login.Login
 import com.bsvt.mark.Mark
-import com.bsvt.memapi.MemApi
 import com.bsvt.memapi.SourceType
+import com.bsvt.memapi.contract.MemApi
+import com.bsvt.memapi.impl.MemRepository
+import com.bsvt.memapi.impl.toSource
 import com.bsvt.memapi.vk.VkMemApi
 import com.radiance.core.Mem
 import com.radiance.core.Source
-import com.radiance.storage.SourceStorage
 import com.radiance.storage.StorageDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.take
 
 
-class MemSwipeFragmentViewModel : ViewModel(), MemApi.MemApiListener {
+class MemSwipeFragmentViewModel : ViewModel() {
     val newsfeed: MutableLiveData<ArrayList<Mem>> = MutableLiveData()
     val recommended: MutableLiveData<ArrayList<Mem>> = MutableLiveData()
-    val subscriptionList: MutableLiveData<ArrayList<Source>> = MutableLiveData()
     val sourcesList: MutableLiveData<ArrayList<Source>> = MutableLiveData()
     val enabledSourceList: MutableLiveData<ArrayList<Source>> = MutableLiveData()
 
     private lateinit var memProvider: MemApi
-    private lateinit var storage: SourceStorage
 
     var request = false
     var count = 0
     var fromStart = false
     var sourceType = SourceType.NEWS
 
-    var isRequested = false
+    private var memFlow: Flow<Mem>? = null
+    private var recommendedFlow: Flow<Mem>? = null
 
 
-    fun login(activity: Activity) {
-        storage = StorageDispatcher().createStorage(
-            activity.applicationContext,
-            StorageDispatcher.Storage.ROOM
-        )
-        memProvider = VkMemApi(storage)
+    suspend fun login(activity: Activity) {
+        memProvider = MemRepository(activity.applicationContext)
 
-        memProvider.addStateListener(this)
-
-        memProvider.toRegister(activity, object : MemApi.AuthorizationListener {
-            override fun isAuthorize(authorize: Boolean) {
-                memProvider.requestSources()
-
-                if (request) {
-                    memProvider.requestMem(count, fromStart, sourceType)
-                    request = false
-                }
+        if (!memProvider.isRegistered()) {
+            memProvider.toRegister(activity)
+        } else {
+            memProvider.requestSources().collect {
+                sourcesList.value = it.toSource()
             }
-        })
+        }
     }
 
-    fun requestMem(count: Int, fromStart: Boolean, source: SourceType) {
+    @ExperimentalCoroutinesApi
+    suspend fun requestMem(count: Int, fromStart: Boolean, source: SourceType) {
         if (memProvider.isRegistered()) {
-            if (!isRequested) {
-                isRequested = true
-                memProvider.requestMem(count, fromStart, source)
+            when (source) {
+                SourceType.NEWS -> {
+                    if (memFlow == null) {
+                        memFlow = memProvider.startMemFlow(count, fromStart)
+                    }
+                }
+                SourceType.RECOMMENDED -> {
+                    if (recommendedFlow == null) {
+                        recommendedFlow = memProvider.startRecommendedMemFlow(count, fromStart)
+                    }
+                }
             }
-        } else {
-            request = true
-            this.count = count
-            this.fromStart = fromStart
-            this.sourceType = source
+        }
+
+
+        when (source) {
+            SourceType.NEWS -> {
+                memFlow?.take(count)?.collect {
+                    newsfeed.value?.add(it)
+                }
+            }
+            SourceType.RECOMMENDED -> {
+                recommendedFlow?.take(count)?.collect {
+                    recommended.value?.add(it)
+                }
+            }
         }
     }
 
@@ -79,26 +92,5 @@ class MemSwipeFragmentViewModel : ViewModel(), MemApi.MemApiListener {
             .markName(name)
             .mark(rating)
             .send()
-    }
-
-    override fun subscriptionUpdate() {
-        subscriptionList.value = ArrayList(storage.getSubscription())
-    }
-
-    override fun sourcesUpdate() {
-        sourcesList.value = ArrayList(storage.getAllRecommendation())
-        enabledSourceList.value = ArrayList(storage.getEnabledSource())
-    }
-
-    override fun enabledSourcesUpdate() {
-        enabledSourceList.value = ArrayList(storage.getEnabledSource())
-    }
-
-    override fun memes(sourceType: SourceType, memes: List<Mem>) {
-        when (sourceType) {
-            SourceType.NEWS -> newsfeed.value = ArrayList(memes)
-            SourceType.RECOMMENDED -> recommended.value = ArrayList(memes)
-        }
-        isRequested = false
     }
 }

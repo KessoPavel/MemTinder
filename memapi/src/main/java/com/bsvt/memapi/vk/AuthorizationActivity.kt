@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.bsvt.memapi.R
+import com.bsvt.memapi.impl.VkApi
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKTokenExpiredHandler
 import com.vk.api.sdk.auth.VKAccessToken
@@ -13,12 +14,10 @@ import com.vk.api.sdk.auth.VKScope
 class AuthorizationActivity : AppCompatActivity() {
     private val callback = object : VKAuthCallback {
         override fun onLogin(token: VKAccessToken) {
-            VkApi.authorizationSuccess(true)
             this@AuthorizationActivity.finish()
         }
 
         override fun onLoginFailed(errorCode: Int) {
-            VkApi.authorizationSuccess(false)
             this@AuthorizationActivity.finish()
         }
     }
@@ -41,7 +40,6 @@ class AuthorizationActivity : AppCompatActivity() {
                 arrayListOf(VKScope.WALL, VKScope.PHOTOS, VKScope.GROUPS, VKScope.FRIENDS)
             )
         } else {
-            VkApi.authorizationSuccess(true)
             this@AuthorizationActivity.finish()
         }
     }

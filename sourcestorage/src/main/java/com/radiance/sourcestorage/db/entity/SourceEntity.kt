@@ -13,5 +13,5 @@ data class SourceEntity (
     @ColumnInfo(name = "avatar")
     val avatar: List<Image>,
     @ColumnInfo(name = "status")
-    val status: SourceStatus
+    var status: SourceStatus
 )
