@@ -22,11 +22,4 @@
         android:textOff="@string/news"
         android:textOn="@string/recommendation"/>
 
-    <ImageButton
-        android:id="@+id/settings"
-        android:layout_margin="10dp"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:background="@drawable/icon_settings"
-        android:layout_gravity="end"/>
 </androidx.appcompat.widget.Toolbar>

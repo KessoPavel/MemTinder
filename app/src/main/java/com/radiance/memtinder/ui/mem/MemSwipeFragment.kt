@@ -30,10 +30,7 @@ import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.StackFrom
 import kotlinx.android.synthetic.main.fragment_memes.*
 import kotlinx.android.synthetic.main.toolbar_mem.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class MemSwipeFragment : Fragment(),
     CardStackListener,
@@ -144,10 +141,6 @@ class MemSwipeFragment : Fragment(),
                 viewModel.requestMem(requestCount, false, sourceType)
             }
         }
-
-        settings.setOnClickListener{
-            findNavController().navigate(R.id.open_settings)
-        }
     }
 
     private fun initRecommendedView() {
@@ -175,7 +168,7 @@ class MemSwipeFragment : Fragment(),
         viewModel.enabledSourceList.observe(this, Observer { })
 
         scope.launch {
-            viewModel.login(activity!!)
+                viewModel.login(activity!!)
         }
     }
 
@@ -261,7 +254,7 @@ class MemSwipeFragment : Fragment(),
     override fun onCardSwiped(direction: Direction?) {
         val swipedMem = adapter.memes[manager.topPosition]
 
-        val rating = when(direction) {
+        val rating = when (direction) {
             Direction.Right -> "like"
             Direction.Left -> "dislike"
             else -> "unknown"
@@ -307,7 +300,8 @@ class MemSwipeFragment : Fragment(),
     }
 
     override fun onTextClick(mem: MemCard) {
-        activity?.supportFragmentManager?.beginTransaction()?.add(R.id.nav_host_fragment, MemText.newInstance(mem.title))
+        activity?.supportFragmentManager?.beginTransaction()
+            ?.add(R.id.nav_host_fragment, MemText.newInstance(mem.title))
             ?.addToBackStack(null)?.commit()
     }
 
