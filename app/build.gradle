@@ -78,7 +78,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation project(path: ':memapi')
-    implementation project(path: ':core')
     implementation project(path: ':storage')
     implementation project(path: ':login')
     implementation project(path: ':mark')

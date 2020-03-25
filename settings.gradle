@@ -1,3 +1,5 @@
-include ':app', ':memapi', ':core', ':storage', ':mark', ':login'
+include ':app', ':memapi', ':storage', ':mark', ':login'
 rootProject.name='MemTinder'
 include ':sourcestorage'
+include ':domain'
+include ':data'
