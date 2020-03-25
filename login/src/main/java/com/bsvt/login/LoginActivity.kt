@@ -48,6 +48,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
 
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        //todo check completedTask exceptions
         try {
             finish()
         } catch (e: ApiException) {

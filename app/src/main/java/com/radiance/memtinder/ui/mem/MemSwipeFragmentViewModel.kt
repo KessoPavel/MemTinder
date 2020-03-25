@@ -6,18 +6,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bsvt.login.Login
 import com.bsvt.mark.Mark
-import com.bsvt.memapi.SourceType
-import com.bsvt.memapi.contract.MemApi
-import com.bsvt.memapi.impl.MemRepository
-import com.bsvt.memapi.impl.toSource
-import com.radiance.core.Mem
-import com.radiance.core.Source
+import com.radiance.data.repositories.VkMemRepository
+import com.radiance.domain.entity.Mem
+import com.radiance.domain.entity.Source
+import com.radiance.domain.repositories.MemRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 
@@ -27,7 +24,7 @@ class MemSwipeFragmentViewModel : ViewModel() {
     val sourcesList: MutableLiveData<ArrayList<Source>> = MutableLiveData()
     val enabledSourceList: MutableLiveData<ArrayList<Source>> = MutableLiveData()
 
-    private var memProvider: MemApi? = null
+    private var memProvider: MemRepository? = null
 
     var request = false
     var count = 0
@@ -39,16 +36,25 @@ class MemSwipeFragmentViewModel : ViewModel() {
 
 
     suspend fun login(activity: Activity) {
-        memProvider = MemRepository(activity.applicationContext)
+        memProvider = VkMemRepository(activity.applicationContext)
+        withContext(Dispatchers.Main) {
+            newsfeed.value = ArrayList()
+            recommended.value = ArrayList()
+            sourcesList.value = ArrayList()
+            enabledSourceList.value = ArrayList()
+        }
 
         if (!memProvider?.isRegistered()!!) {
             memProvider?.toRegister(activity)
         } else {
+            requestMem(10, true, SourceType.NEWS)
+
             memProvider?.requestSources()?.collect {
                 withContext(Dispatchers.Main) {
-                    sourcesList.value = it.toSource()
+                    sourcesList.value = ArrayList(it)
                 }
             }
+
         }
     }
 
@@ -74,11 +80,17 @@ class MemSwipeFragmentViewModel : ViewModel() {
             SourceType.NEWS -> {
                 memFlow?.take(count)?.collect {
                     newsfeed.value?.add(it)
+                    withContext(Dispatchers.Main) {
+                        newsfeed.value = newsfeed.value
+                    }
                 }
             }
             SourceType.RECOMMENDED -> {
                 recommendedFlow?.take(count)?.collect {
                     recommended.value?.add(it)
+                    withContext(Dispatchers.Main) {
+                        recommended.value = recommended.value
+                    }
                 }
             }
         }
@@ -97,4 +109,9 @@ class MemSwipeFragmentViewModel : ViewModel() {
             .mark(rating)
             .send()
     }
+}
+
+enum class SourceType {
+    NEWS,
+    RECOMMENDED
 }

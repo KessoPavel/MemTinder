@@ -11,14 +11,12 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
-import com.bsvt.memapi.SourceType
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.radiance.core.Id
-import com.radiance.core.Image
-import com.radiance.core.Mem
-import com.radiance.core.Source
+import com.radiance.domain.entity.Id
+import com.radiance.domain.entity.Image
+import com.radiance.domain.entity.Mem
+import com.radiance.domain.entity.Source
 import com.radiance.memtinder.R
 import com.radiance.memtinder.ui.mem.swipeAdapter.CardSwipeAdapter
 import com.radiance.memtinder.ui.mem.swipeAdapter.MemCard
@@ -68,10 +66,6 @@ class MemSwipeFragment : Fragment(),
 
         initView()
         initViewModel()
-
-        scope.launch {
-            viewModel.requestMem(requestCount, false, sourceType)
-        }
     }
 
     private fun initView() {
