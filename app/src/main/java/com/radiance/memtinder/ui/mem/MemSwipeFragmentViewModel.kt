@@ -1,7 +1,7 @@
 package com.radiance.memtinder.ui.mem
 
 import android.app.Activity
-import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bsvt.login.Login
@@ -60,6 +60,7 @@ class MemSwipeFragmentViewModel : ViewModel() {
 
     @ExperimentalCoroutinesApi
     suspend fun requestMem(count: Int, fromStart: Boolean, source: SourceType) {
+        Log.d("MEM_REQUEST", "VM: requestMem")
         if (memProvider?.isRegistered()?:false) {
             when (source) {
                 SourceType.NEWS -> {

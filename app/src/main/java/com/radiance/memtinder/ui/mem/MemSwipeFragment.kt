@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +28,7 @@ import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.StackFrom
 import kotlinx.android.synthetic.main.fragment_memes.*
+import kotlinx.android.synthetic.main.item_mem.*
 import kotlinx.android.synthetic.main.toolbar_mem.*
 import kotlinx.coroutines.*
 
@@ -168,15 +170,20 @@ class MemSwipeFragment : Fragment(),
 
     private fun addNewMemes(memes: ArrayList<Mem>?) {
         memes?.let {
-            newsAdapter.memes.addAll(memToCard(viewModel.sourcesList.value, memes))
-            newsAdapter.notifyItemInserted(newsAdapter.memes.size - memes.size)
+            Log.d("MEM_REQUEST", "View mem = ${it.size}")
+            val oldSize = newsAdapter.memes.size
+            val newSize = it.size
+            newsAdapter.memes = ArrayList(memToCard(viewModel.sourcesList.value, memes))
+            newsAdapter.notifyItemRangeInserted(oldSize, newSize - oldSize)
         }
     }
 
     private fun addRecommended(memes: ArrayList<Mem>?) {
         memes?.let {
-            recommendedAdapter.memes.addAll(memToCard(viewModel.sourcesList.value, memes))
-            recommendedAdapter.notifyItemInserted(recommendedAdapter.memes.size - memes.size)
+            val oldSize = recommendedAdapter.memes.size
+            val newSize = it.size
+            recommendedAdapter.memes = ArrayList(memToCard(viewModel.sourcesList.value, memes))
+            recommendedAdapter.notifyItemRangeChanged(oldSize, newSize - oldSize)
         }
     }
 

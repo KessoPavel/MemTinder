@@ -2,6 +2,7 @@ package com.radiance.data.repositories
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import com.radiance.data.vkapi.VkApi
 import com.radiance.data.vkapi.vk.request.newsfeed.NewsfeedRequest
 import com.radiance.data.vkapi.vk.request.recommended.RecommendedRequest
@@ -54,13 +55,16 @@ class VkMemRepository(context: Context) : MemRepository {
     }
 
     override fun startMemFlow(step: Int, fromStart: Boolean): Flow<Mem> {
+        Log.d("MEM_REQUEST", "MemRepository startMemFlow")
         newsStep = step
         val startFrom = if (fromStart) "" else newsStartFrom
 
         requestNews(newsStep, startFrom)
 
         return flow {
+            Log.d("MEM_REQUEST", "MemRepository.Flow startMemFlow")
             for (mem in newsChannel) {
+                Log.d("MEM_REQUEST", "MemRepository.Flow sendMem = ${mem.postId}")
                 emit(mem)
             }
         }
@@ -118,6 +122,7 @@ class VkMemRepository(context: Context) : MemRepository {
         scope.launch {
             for (news in VkApi.newsChannel) {
                 if (!receivedMemes.contains(news.startFrom)) {
+                    Log.d("MEM_REQUEST", "MemRepository.listenNews receive = ${news.startFrom}")
                     receivedMemes.add(news.startFrom)
                     newsStartFrom = news.startFrom
 
