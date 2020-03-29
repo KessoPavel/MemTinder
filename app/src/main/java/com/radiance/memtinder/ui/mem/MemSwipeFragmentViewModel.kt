@@ -10,6 +10,9 @@ import com.radiance.data.repositories.VkMemRepository
 import com.radiance.domain.entity.Mem
 import com.radiance.domain.entity.Source
 import com.radiance.domain.repositories.MemRepository
+import com.radiance.domain.usecases.GetNewsFeedFlowUseCase
+import com.radiance.domain.usecases.GetRecommendedFlowUseCase
+import com.radiance.domain.usecases.GetResourcesFlowUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -28,8 +31,6 @@ class MemSwipeFragmentViewModel : ViewModel() {
 
     var request = false
     var count = 0
-    var fromStart = false
-    var sourceType = SourceType.NEWS
 
     private var memFlow: Flow<Mem>? = null
     private var recommendedFlow: Flow<Mem>? = null
@@ -49,12 +50,14 @@ class MemSwipeFragmentViewModel : ViewModel() {
         } else {
             requestMem(10, true, SourceType.NEWS)
 
-            memProvider?.requestSources()?.collect {
-                withContext(Dispatchers.Main) {
-                    sourcesList.value = ArrayList(it)
+            memProvider?.let {
+                val useCase = GetResourcesFlowUseCase(it)
+                useCase.get().collect {
+                    withContext(Dispatchers.Main) {
+                        sourcesList.value = ArrayList(it)
+                    }
                 }
             }
-
         }
     }
 
@@ -65,12 +68,18 @@ class MemSwipeFragmentViewModel : ViewModel() {
             when (source) {
                 SourceType.NEWS -> {
                     if (memFlow == null) {
-                        memFlow = memProvider?.startMemFlow(count, fromStart)
+                        memProvider?.let {
+                            val useCase = GetNewsFeedFlowUseCase(it, count, fromStart)
+                            memFlow = useCase.get()
+                        }
                     }
                 }
                 SourceType.RECOMMENDED -> {
                     if (recommendedFlow == null) {
-                        recommendedFlow = memProvider?.startRecommendedMemFlow(count, fromStart)
+                        memProvider?.let {
+                            val useCase = GetRecommendedFlowUseCase(it, count, fromStart)
+                            recommendedFlow = useCase.get()
+                        }
                     }
                 }
             }
